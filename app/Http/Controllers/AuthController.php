@@ -13,28 +13,22 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email'    => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+{
+    $credentials = $request->validate([
+        'email'    => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            // Redirect berdasarkan role
-            $user = Auth::user();
-            if ($user->role === 'admin' || $user->role === 'super_admin') {
-                return redirect()->intended('/admin/anggota');
-            }
-
-            return redirect()->intended('/dashboard'); // untuk anggota misalnya
-        }
-
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ]);
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/dashboard'); // Semua role diarahkan ke dashboard
     }
+
+    return back()->withErrors([
+        'email' => 'Email atau password salah.',
+    ]);
+}
+
 
     public function logout(Request $request)
     {
