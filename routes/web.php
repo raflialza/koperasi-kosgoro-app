@@ -5,7 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AnggotaController;
 
 // Halaman utama
-Route::redirect('/', '/login');
+Route::get('/', function () {
+    return view('auth/login');
+});
 
 // Login routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
