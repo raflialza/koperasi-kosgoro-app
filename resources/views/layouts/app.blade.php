@@ -14,8 +14,8 @@
     @php $role = auth()->user()->role ?? 'guest'; @endphp
     <nav class="space-y-2">
       @if($role === 'anggota')
-        <a href="{{ route('dashboard') }}" class="block hover:bg-blue-700 p-2 rounded">Data Diri</a>
-        <a href="#" class="block hover:bg-blue-700 p-2 rounded">Simpanan Saya</a>
+        <a href="{{ route('anggota.dataDiri') }}" class="block hover:bg-blue-700 p-2 rounded">Profile</a>
+        <a href="{{ route('anggota.simpanan') }}" class="block hover:bg-blue-700 p-2 rounded">Simpanan Saya</a>
         <a href="#" class="block hover:bg-blue-700 p-2 rounded">Pinjaman Saya</a>
       @endif
 
