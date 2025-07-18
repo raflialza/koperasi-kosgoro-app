@@ -37,7 +37,7 @@
                 <td class="p-2 border">{{ $a->instansi }}</td>
                 <td class="p-2 border">{{ $a->tahun_gabung }}</td>
                 <td class="p-2 border space-x-2">
-                    <a href="{{ route('anggota.edit', $a->id) }}" class="bg-yellow-400 text-white px-2 py-1 rounded">Edit</a>
+                    <a href="{{ route('anggota.edit', $a->id) }}" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</a>
 
                     @if(auth()->user()->role === 'super_admin')
                     <form action="{{ route('anggota.destroy', $a->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin hapus?')">
