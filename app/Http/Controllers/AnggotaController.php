@@ -47,7 +47,7 @@ class AnggotaController extends Controller
             'tahun_gabung'  => $request->tahun_gabung,
         ]);
 
-        return redirect()->route('anggota.index')->with('success', 'Anggota berhasil ditambahkan.');
+        return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil ditambahkan.');
     }
 
     public function edit(User $anggota)
@@ -70,20 +70,14 @@ class AnggotaController extends Controller
             'nama', 'email', 'no_telp', 'alamat', 'instansi', 'tahun_gabung'
         ]));
 
-        return redirect()->route('anggota.index')->with('success', 'Data anggota diperbarui.');
+        return redirect()->route('admin.anggota.index')->with('success', 'Data anggota diperbarui.');
     }
 
-    public function destroy(User $anggota)
+    public function destroy($id)
     {
-    
-        $user = Auth::user();
-
-        if (!$user || $user->role !== 'super_admin') {
-            abort(403, 'Anda tidak memiliki izin untuk menghapus anggota.');
-        }
-
+        $anggota = User::findOrFail($id);
         $anggota->delete();
 
-        return redirect()->route('anggota.index')->with('success', 'Anggota dihapus.');
+    return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil dihapus.');
     }
 }

@@ -5,7 +5,7 @@
 <div class="max-w-xl mx-auto">
     <h2 class="text-xl font-bold mb-4">{{ isset($anggota) ? 'Edit Anggota' : 'Tambah Anggota' }}</h2>
 
-    <form action="{{ route('anggota.store') }}" method="POST">
+    <form action="{{ route('admin.anggota.store') }}" method="POST">
         @csrf
         @if(isset($anggota))
             @method('PUT')

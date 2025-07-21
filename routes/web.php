@@ -5,34 +5,26 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\SimpananController;
 
-// Halaman utama
-Route::get('/', function () {
-    return view('auth/login');
-});
 
-// Login routes
+// HALAMAN UTAMA (Login)
+Route::get('/', fn () => view('auth/login'));
+// LOGIN & LOGOUT
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// Dashboard
-
-
+// DASHBOARD UTAMA (SETELAH LOGIN)
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth')->name('dashboard');
-
-    Route::get('/data-diri', function () {
-        return view('anggota.data-diri');
-    })->name('anggota.dataDiri');
+    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+    // Data diri anggota
+    Route::get('/data-diri', fn () => view('anggota.data-diri'))->name('anggota.dataDiri');
+    // Simpanan saya (khusus anggota)
+    Route::middleware('role:anggota')->get('/simpanan-saya', [SimpananController::class, 'simpananSaya'])->name('anggota.simpanan');
 });
-Route::middleware(['auth', 'role:anggota'])->get('/simpanan-saya', [SimpananController::class, 'simpananSaya'])->name('anggota.simpanan');
 
-// Admin routes
-Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->group(function () {
+// ROUTE ADMIN & SUPER ADMIN
+Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Kelola anggota
     Route::resource('anggota', AnggotaController::class);
-});
-Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->group(function () {
-    Route::get('/simpanan', [SimpananController::class, 'index'])->name('admin.simpanan.index');
+    // Halaman simpanan (khusus admin/super admin)
+    Route::get('/simpanan', [SimpananController::class, 'index'])->name('simpanan.index');
 });

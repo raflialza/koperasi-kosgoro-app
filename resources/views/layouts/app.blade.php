@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>@yield('title', 'Dashboard')</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex">
 
@@ -29,7 +30,7 @@
       @endif
 
       @if(in_array($role, ['admin', 'super_admin']))
-        <a href="{{ route('anggota.index') }}" class="block p-2 rounded transition duration-200 text-gray-400 hover:text-white">Kelola Anggota</a>
+        <a href="{{ route('admin.anggota.index') }}" class="block p-2 rounded transition duration-200 text-gray-400 hover:text-white">Kelola Anggota</a>
         <a href="#" class="block p-2 rounded transition duration-200 text-gray-400 hover:text-white">Input Simpanan</a>
         <a href="#" class="block p-2 rounded transition duration-200 text-gray-400 hover:text-white">Kelola Pinjaman</a>
         <a href="#" class="block p-2 rounded transition duration-200 text-gray-400 hover:text-white">Laporan Keuangan</a>

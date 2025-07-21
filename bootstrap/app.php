@@ -11,10 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Daftarkan middleware alias
         $middleware->alias([
-        // alias name => class path
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
-    ]);
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
+
+        // Tambahkan PreventBackHistory sebagai global middleware
+        $middleware->append(\App\Http\Middleware\PreventBackHistory::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
