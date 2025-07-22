@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
+<div class="container">
     <a href="{{ route('admin.anggota.create') }}" class="btn btn-primary mb-3">
         <i class="bi bi-person-plus me-2"></i> Anggota
     </a>

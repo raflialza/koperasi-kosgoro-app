@@ -13,33 +13,22 @@ class Pinjaman extends Model
 
     protected $fillable = [
         'user_id',
-        'tahun',
-        'saldo_pinjaman_awal',
         'jumlah_pinjaman',
-        'bunga',
-        'jangka_waktu',
+        'tenor',
         'status',
-        'tanggal_pinjam',
-        'tanggal_jatuh_tempo',
+        'tanggal_pengajuan',
+        'tanggal_disetujui',
         'keperluan',
         'approved_by',
-        'approved_at',
     ];
 
-    protected $casts = [
-        'tanggal_pinjam' => 'date',
-        'tanggal_jatuh_tempo' => 'date',
-        'approved_at' => 'datetime',
-    ];
-
-    // Relationship
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function approvedBy()
+    public function angsuran()
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->hasMany(Angsuran::class);
     }
 }

@@ -14,28 +14,14 @@ class Simpanan extends Model
     protected $fillable = [
         'user_id',
         'jenis_simpanan',
-        'tahun',
-        'bulan',
-        'saldo_awal',
         'jumlah',
-        'saldo_akhir',
         'tanggal_transaksi',
         'keterangan',
         'processed_by',
     ];
 
-    protected $casts = [
-        'tanggal_transaksi' => 'date',
-    ];
-
-    // Relationship
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function processedBy()
-    {
-        return $this->belongsTo(User::class, 'processed_by');
     }
 }

@@ -10,13 +10,9 @@ return new class extends Migration
     {
         Schema::create('simpanan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('jenis_simpanan', ['pokok', 'wajib']);
-            $table->year('tahun');
-            $table->integer('bulan'); // 1-12
-            $table->decimal('saldo_awal', 15, 2)->default(0); // Saldo awal tahun
-            $table->decimal('jumlah', 15, 2); // Jumlah transaksi
-            $table->decimal('saldo_akhir', 15, 2); // Saldo setelah transaksi
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->enum('jenis_simpanan', ['Pokok', 'Wajib']);
+            $table->decimal('jumlah', 15, 2);
             $table->date('tanggal_transaksi');
             $table->text('keterangan')->nullable();
             $table->foreignId('processed_by')->nullable()->constrained('users');

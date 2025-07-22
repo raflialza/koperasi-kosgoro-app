@@ -20,9 +20,24 @@ class AuthController extends Controller
     ]);
 
     if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        return redirect()->intended('/dashboard'); // Semua role diarahkan ke dashboard
-    }
+            $request->session()->regenerate();
+
+            // --- BAGIAN LOGIKA REDIRECT DINAMIS ---
+            $user = Auth::user(); // Ambil data user yang baru saja login
+
+            if ($user->role === 'admin' || $user->role === 'super_admin') {
+                // Jika admin atau super_admin, arahkan ke route 'home'
+                return redirect()->intended(route('home'));
+            }
+
+            if ($user->role === 'anggota') {
+                // Jika anggota, arahkan ke route profilnya
+                return redirect()->intended(route('anggota.dataDiri'));
+            }
+            
+            // Fallback default jika ada role lain (meskipun seharusnya tidak terjadi)
+            return redirect('/');
+        }
 
     return back()->withErrors([
         'email' => 'Email atau password salah.',

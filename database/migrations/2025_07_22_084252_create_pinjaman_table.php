@@ -10,18 +10,14 @@ return new class extends Migration
     {
         Schema::create('pinjaman', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->year('tahun');
-            $table->decimal('saldo_pinjaman_awal', 15, 2)->default(0); // Saldo pinjaman awal tahun
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->decimal('jumlah_pinjaman', 15, 2);
-            $table->decimal('bunga', 5, 2);
-            $table->integer('jangka_waktu');
-            $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
-            $table->date('tanggal_pinjam');
-            $table->date('tanggal_jatuh_tempo');
+            $table->integer('tenor'); // Jangka waktu dalam bulan
+            $table->enum('status', ['menunggu', 'disetujui', 'ditolak', 'lunas'])->default('menunggu');
+            $table->date('tanggal_pengajuan');
+            $table->date('tanggal_disetujui')->nullable();
             $table->text('keperluan')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users');
-            $table->timestamp('approved_at')->nullable();
             $table->timestamps();
         });
     }
