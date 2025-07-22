@@ -5,7 +5,7 @@
   <title>Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="from-[#253B80] bg-gradient-to-bl to-[#179BD7] flex justify-center items-center h-screen">
+<body class=" bg-amber-100 flex justify-center items-center h-screen">
 
   <!-- Container utama -->
   <div class="flex flex-col items-center gap-4">
@@ -18,9 +18,9 @@
 
     <!-- Form login -->
     <form method="POST" action="{{ route('login') }}"
-          class="bg-white border-2 border-[#FF6000] p-8 rounded-xl w-96 shadow-lg">
+          class=" bg-blue-600 border-2 border-[#FF6000] p-8 rounded-xl w-96 shadow-lg">
       @csrf
-      <h1 class="text-2xl font-bold mb-6 text-center text-black">USER LOGIN</h1>
+      <h1 class="text-2xl font-bold mb-6 text-center text-amber-50">USER LOGIN</h1>
 
       @error('email')
         <div class="bg-red-100 text-red-600 p-2 mb-4 rounded">{{ $message }}</div>

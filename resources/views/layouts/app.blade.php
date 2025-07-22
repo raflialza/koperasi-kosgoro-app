@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Koperasi Dashboard</title>
-
+    
+    <link href="{{ asset('css/custom-style.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">  
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -19,15 +20,17 @@
             color: white;
         }
         .sidebar a {
-            color: white;
+            color: #cfd8ff; /* Warna teks normal: agak gelap */
             text-decoration: none;
+            transition: color 0.2s ease;
         }
         .sidebar a:hover {
-            color: #ffd369;
+            color: #ffffff; /* Warna teks saat hover: cerah */
         }
         .sidebar .active {
             background-color: #3c4cad;
             border-radius: 10px;
+            color: #ffffff; /* Warna teks di item aktif */
         }
     </style>
 </head>
@@ -37,74 +40,70 @@
         <!-- Sidebar -->
         <nav class="col-md-2 d-none d-md-block sidebar p-4 min-vh-100">
             <div class="d-flex align-items-center mb-4">
-                <i class="bi bi-box-fill fs-4 me-2"></i>
-                <span class="fs-5 fw-bold">Koperasi</span>
+                <i class="bi bi-box-fill fs-3 me-2"></i>
+                <span class="fs-2 fw-bold">Koperasi</span>
             </div>
             @php $role = auth()->user()->role ?? 'guest'; @endphp
             <ul class="nav flex-column">
-      @if($role === 'anggota')
-        <li class="nav-item">
-          <a href="{{ route('anggota.dataDiri') }}"
-             class="nav-link text-white {{ request()->routeIs('anggota.dataDiri') ? 'active' : '' }}">
-            Profil
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ route('anggota.simpanan') }}"
-             class="nav-link text-white {{ request()->routeIs('anggota.simpanan') ? 'active' : '' }}">
-            Simpanan Saya
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#"
-             class="nav-link text-white">
-            Pinjaman Saya
-          </a>
-        </li>
-      @endif
+                @if($role === 'anggota')
+                <li class="nav-item">
+                    <a href="{{ route('anggota.dataDiri') }}"
+                        class="nav-link {{ request()->routeIs('anggota.dataDiri') ? 'active' : '' }}">
+                        Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('anggota.simpanan') }}"
+                        class="nav-link {{ request()->routeIs('anggota.simpanan') ? 'active' : '' }}">
+                        Simpanan Saya
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Pinjaman Saya</a>
+                </li>
+                @endif
 
-      @if(in_array($role, ['admin', 'super_admin']))
-        <li class="nav-item">
-          <a href="#" class="nav-link text-white {{ request()->routeIs('admin.home') ? 'active' : '' }}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ route('admin.anggota.index') }}" class="nav-link text-white {{ request()->routeIs('admin.anggota.index') ? 'active' : '' }}">Kelola Anggota</a>
-        @if($role === 'super_admin')
-        <li class="nav-item">
-          <a href="#" class="nav-link text-white">Manajemen Admin</a>
-        </li>
-        @endif
-        </li>
-        <li class="nav-item">
-          <a href="#"class="nav-link text-white">Input Simpanan</a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link text-white">Kelola Pinjaman</a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link text-white">Laporan Keuangan</a>
-          </a>
-        </li>
-      @endif
-    </ul>
+                @if(in_array($role, ['admin', 'super_admin']))
+                <li class="nav-item">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.home') ? 'active' : '' }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.anggota.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.anggota.index') ? 'active' : '' }}">Kelola Anggota</a>
+                </li>
+                @if($role === 'super_admin')
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Manajemen Admin</a>
+                </li>
+                @endif
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Input Simpanan</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Kelola Pinjaman</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Laporan Keuangan</a>
+                </li>
+                @endif
+            </ul>
         </nav>
 
         <!-- Content Area -->
         <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-3">
             <!-- Top Navbar -->
-            <nav class="navbar navbar-light bg-white rounded shadow-sm mb-4 px-4">
+            <nav class="navbar navbar-light bg-blend-lighten rounded shadow-sm mb-4 px-4">
                 <span class="navbar-brand mb-0 h4">Selamat Datang, {{ auth()->user()->nama ?? 'Guest' }}</span>
                 <div class="d-flex align-items-center rounded ms-auto">
                     <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="col-md btn btn-danger ms-sm-auto ">Logout</button>
+                        @csrf
+                        <button class="col-md btn btn-danger ms-sm-auto ">Logout</button>
                     </form>
                 </div>
             </nav>
 
             @yield('content')
             @yield('scripts')
-
         </main>
     </div>
 </div>
