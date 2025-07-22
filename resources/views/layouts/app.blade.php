@@ -64,7 +64,7 @@
                 @endif
                 @if($role === 'admin' || $role === 'super_admin')
                   <li class="nav-item">
-                      <a href="#" class="nav-link text-white {{ request()->routeIs('admin.home') ? 'active' : '' }}">
+                      <a href="{{ route('home') }}" class="nav-link text-white {{ request()->routeIs('admin.home') ? 'active' : '' }}">
                           <i class="bi bi-house-door me-2"></i>Home
                       </a>
                   </li>

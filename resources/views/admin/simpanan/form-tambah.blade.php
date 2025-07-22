@@ -9,7 +9,7 @@
                     <h5 class="mb-0">Form Tambah Simpanan Anggota</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.simpanan.proses_tambah') }}" method="POST">
+                    <form action="{{ route('admin.simpanan.proses-tambah') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="user_id" class="form-label">Pilih Anggota</label>

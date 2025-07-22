@@ -61,8 +61,9 @@ Route::middleware(['auth', 'role:anggota'])->prefix('anggota')->name('anggota.')
 */
 Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('admin.')->group(function () {
     // Kelola Anggota
-    Route::resource('anggota', AnggotaController::class);
-
+    Route::resource('anggota', AnggotaController::class)->parameters([
+    'anggota' => 'anggota',
+]);
     // Kelola Simpanan
     Route::get('/simpanan', [TransaksiController::class, 'daftarSemuaSimpanan'])->name('simpanan.index');
     Route::get('/simpanan/tambah', [TransaksiController::class, 'tambahSimpananForm'])->name('simpanan.tambah');

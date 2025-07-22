@@ -24,7 +24,7 @@
                     <h5 class="mb-0">Form Pembayaran Angsuran ke-{{ $angsuranKe }}</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.pinjaman.proses_bayar', $pinjaman->id) }}" method="POST">
+                    <form action="{{ route('admin.pinjaman.proses-bayar', $pinjaman->id) }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="jumlah_bayar" class="form-label">Jumlah Bayar (Rp)</label>
