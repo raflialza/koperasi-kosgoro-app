@@ -11,16 +11,45 @@ use App\Models\Pinjaman;
 
 class AnggotaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $anggota = User::where('role', 'anggota')->get();
+        $query = User::where('role', 'anggota');
+
+        // Filter pencarian nama atau email
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%');
+        });
+    }
+
+        // Filter instansi
+        if ($request->filled('instansi')) {
+            $query->where('instansi', $request->instansi);
+    }
+
+        $anggota = $query->get();
+
         return view('admin.kelola-anggota', compact('anggota'));
     }
 
     public function create()
     {
-        return view('admin.form-anggota');
+    // Ambil user dengan id_anggota tertinggi (misal: A001, A099, dst)
+    $lastUser = User::where('role', 'anggota')
+        ->orderBy('id_anggota', 'desc')
+        ->first();
+
+    if ($lastUser && preg_match('/AGT(\d+)/', $lastUser->id_anggota, $matches)) {
+        $lastNumber = (int)$matches[1]; // Ambil angka saja
+        $newId = 'AGT' . str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT); // Format: GT001, AGT002, dst.
+    } else {
+        $newId = 'AGT001'; // Jika belum ada anggota
     }
+
+    return view('admin.form-anggota', ['newId' => $newId]);
+    }
+
 
     public function store(Request $request)
     {
@@ -36,6 +65,7 @@ class AnggotaController extends Controller
         ]);
 
         User::create([
+            
             'id_anggota'    => $request->id_anggota,
             'nama'          => $request->nama,
             'email'         => $request->email,
@@ -58,19 +88,27 @@ class AnggotaController extends Controller
     public function update(Request $request, User $anggota)
     {
         $request->validate([
-            'nama'       => 'required|string|max:255',
-            'email'      => 'required|email|unique:users,email,' . $anggota->id,
-            'no_telp'    => 'required',
-            'alamat'     => 'required',
-            'instansi'   => 'required|in:SMP,SMA,SMK',
-            'tahun_gabung' => 'required|digits:4',
-        ]);
+            'nama'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email,' . $anggota->id,
+            'no_telp'       => 'required',
+            'alamat'        => 'required',
+            'instansi'      => 'required|in:SMP,SMA,SMK',
+            'tahun_gabung'  => 'required|digits:4',
+            'password'      => 'nullable|min:6', // password boleh kosong
+    ]);
 
-        $anggota->update($request->only([
+        $data = $request->only([
             'nama', 'email', 'no_telp', 'alamat', 'instansi', 'tahun_gabung'
-        ]));
+    ]);
 
-        return redirect()->route('admin.anggota.index')->with('success', 'Data anggota diperbarui.');
+    // Jika password diisi, update juga
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+    }
+
+        $anggota->update($data);
+
+    return redirect()->route('admin.anggota.index')->with('success', 'Data anggota diperbarui.');
     }
 
     public function destroy($id)

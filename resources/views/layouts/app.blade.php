@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Koperasi Dashboard</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Icons (Bootstrap Icons or FontAwesome) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">  
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -37,7 +35,7 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-md-2 d-none d-md-block sidebar p-4">
+        <nav class="col-md-2 d-none d-md-block sidebar p-4 min-vh-100">
             <div class="d-flex align-items-center mb-4">
                 <i class="bi bi-box-fill fs-4 me-2"></i>
                 <span class="fs-5 fw-bold">Koperasi</span>
@@ -92,24 +90,26 @@
         </nav>
 
         <!-- Content Area -->
-        <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-3">
             <!-- Top Navbar -->
             <nav class="navbar navbar-light bg-white rounded shadow-sm mb-4 px-4">
                 <span class="navbar-brand mb-0 h4">Selamat Datang, {{ auth()->user()->nama ?? 'Guest' }}</span>
-                <div class="d-flex">
+                <div class="d-flex align-items-center rounded ms-auto">
                     <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button class="btn btn-danger btn-sm">Logout</button>
+                    <button class="col-md btn btn-danger ms-sm-auto ">Logout</button>
                     </form>
                 </div>
             </nav>
 
             @yield('content')
+            @yield('scripts')
+
         </main>
     </div>
 </div>
-
-<!-- Bootstrap 5 JS (Popper + Bootstrap Bundle) -->
+<script src="{{ asset('js/sweetalert-custom.js') }}"></script>
+@stack('scripts')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

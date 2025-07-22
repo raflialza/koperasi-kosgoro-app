@@ -1,68 +1,100 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4" x-data="{ search: '', instansi: '' }">
-    <h1 class="h3 mb-4 fw-bold">Kelola Anggota</h1>
-
-    <!-- Tombol Tambah -->
-    <a href="{{ route('admin.anggota.create') }}" class="btn btn-primary mb-3">Tambah Anggota</a>
-
-    <!-- Filter -->
-    <div class="row mb-3 g-2">
-        <div class="col-md-4">
-            <input type="text" x-model="search" placeholder="Cari" class="form-control" />
+<div class="container py-4">
+    <a href="{{ route('admin.anggota.create') }}" class="btn btn-primary mb-3">
+        <i class="bi bi-person-plus me-2"></i> Anggota
+    </a>
+    
+<div class="table-container mb-4">
+    <div class="table-wrapper rounded shadow-sm border bg-white p-0">
+        <div class="table-title d-flex align-items-center justify-content-between bg-primary text-white px-4 py-3 mb-0" style="border-top-left-radius: .5rem; border-top-right-radius: .5rem;">
+            <h5 class="mb-0 fw-bold">Daftar Anggota</h5>
+            <form method="GET" action="{{ route('admin.anggota.index') }}" class="row g-2 align-items-center mb-0">
+                <div class="col-auto">
+                    <input type="text" name="search" class="form-control" placeholder="Cari nama atau email..." value="{{ request('search') }}">
+                </div>
+                <div class="col-auto">
+                    <select name="instansi" class="form-select">
+                        <option value=""> All</option>
+                        <option value="SMP" {{ request('instansi') == 'SMP' ? 'selected' : '' }}>SMP</option>
+                        <option value="SMA" {{ request('instansi') == 'SMA' ? 'selected' : '' }}>SMA</option>
+                        <option value="SMK" {{ request('instansi') == 'SMK' ? 'selected' : '' }}>SMK</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-light" title="Filter">
+                        <i class="bi bi-funnel-fill"></i>
+                    </button>
+                </div>
+                <div class="col-auto ms-auto">
+                    <a href="{{ route('admin.anggota.index') }}" class="btn btn-light" title="Reset">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </a>
+                </div>
+            </form>
         </div>
-        <div class="col-md-3">
-            <select x-model="instansi" class="form-select">
-                <option value="">Semua Instansi</option>
-                <option value="SMP">SMP</option>
-                <option value="SMA">SMA</option>
-                <option value="SMK">SMK</option>
-            </select>
+        <div class="p-3">
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="align-middle text-center">
+                            <th scope="col">No</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Phone</th>
+                            <th scope="col">Institution</th>
+                            <th scope="col">Year Joined</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($anggota as $a)
+                        <tr class="text-center">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $a->id_anggota }}</td>
+                            <td class="text-start">{{ $a->nama }}</td>
+                            <td class="text-start">{{ $a->email }}</td>
+                            <td>{{ $a->no_telp }}</td>
+                            <td>
+                                <span class="badge bg-{{ $a->instansi == 'SMP' ? 'primary' : ($a->instansi == 'SMA' ? 'success' : 'warning') }}">
+                                    {{ $a->instansi }}
+                                </span>
+                            </td>
+                            <td>{{ $a->tahun_gabung }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <form method="GET" action="{{ route('admin.anggota.edit', $a->id) }}">
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    </form>
+                                    @if(auth()->user()->role === 'super_admin')
+                                    <form id="delete-form-{{ $a->id }}" method="POST" action="{{ route('admin.anggota.destroy', $a->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('{{ $a->id }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">Tidak ada data anggota.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-
-    <!-- Tabel -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>No. Telp</th>
-                    <th>Alamat</th>
-                    <th>Instansi</th>
-                    <th>Tahun Gabung</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($anggota as $a)
-                <tr x-show="(search === '' || '{{ strtolower($a->nama) }} {{ strtolower($a->email) }} {{ $a->no_telp }}'.toLowerCase().includes(search.toLowerCase())) && 
-                            (instansi === '' || instansi === '{{ $a->instansi }}')">
-                    <td>{{ $a->id_anggota }}</td>
-                    <td>{{ $a->nama }}</td>
-                    <td>{{ $a->email }}</td>
-                    <td>{{ $a->no_telp }}</td>
-                    <td>{{ $a->alamat }}</td>
-                    <td>{{ $a->instansi }}</td>
-                    <td>{{ $a->tahun_gabung }}</td>
-                    <td>
-                        <a href="{{ route('admin.anggota.edit', $a->id) }}" class="btn btn-sm btn-warning me-1">Edit</a>
-
-                        @if(auth()->user()->role === 'super_admin')
-                        <form x-data="{ open: false }" @submit.prevent="open = true" method="POST" action="{{ route('admin.anggota.destroy', $a->id) }}" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                        </form>
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
     </div>
 </div>
+</div>
 @endsection
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+@include('components.sweetalert')
