@@ -35,8 +35,8 @@
             </form>
         </div>
         <div class="p-3">
-            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                <table class="table table-hover align-middle mb-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm align-middle mb-0">
                     <thead class="table-light">
                         <tr class="align-middle text-center">
                             <th scope="col">No</th>
