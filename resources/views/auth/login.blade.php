@@ -25,7 +25,7 @@
         <img src="{{ asset('images/logokosgoro.png') }}" alt="Logo Kosgoro" class="login-logo">
       </div>
 
-      <h4 class="text-center text-orange-custom mb-4">USER LOGIN</h4>
+      <h4 class="text-center text-orange-custom mb-4">LOGIN KOPERASI</h4>
 
       @error('email')
         <div class="alert alert-danger">{{ $message }}</div>
