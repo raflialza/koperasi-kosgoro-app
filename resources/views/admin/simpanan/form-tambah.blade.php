@@ -26,6 +26,7 @@
                             <select class="form-select @error('jenis_simpanan') is-invalid @enderror" id="jenis_simpanan" name="jenis_simpanan" required>
                                 <option value="pokok">Simpanan Pokok</option>
                                 <option value="wajib">Simpanan Wajib</option>
+                                <option value="sukarela">Simpanan Sukarela</option>
                             </select>
                              @error('jenis_simpanan') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('simpanan', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('jenis_simpanan', ['Pokok', 'Wajib']);
+            $table->enum('jenis_simpanan', ['Pokok', 'Wajib', 'Sukarela']);
             $table->decimal('jumlah', 15, 2);
             $table->date('tanggal_transaksi');
             $table->text('keterangan')->nullable();
