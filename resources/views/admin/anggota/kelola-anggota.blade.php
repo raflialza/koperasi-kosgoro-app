@@ -4,16 +4,16 @@
 <div class="container py-4">
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold">Manajemen Simpanan Anggota</h5>
-            <a href="{{ route('admin.simpanan.tambah') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Tambah Simpanan
+            <h5 class="mb-0 fw-bold">Manajemen Data Anggota</h5>
+            <a href="{{ route('admin.anggota.create') }}" class="btn btn-primary">
+                <i class="bi bi-person-plus-fill me-2"></i>Tambah Anggota
             </a>
         </div>
         <div class="card-body">
             <div class="mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="Ketik nama atau ID anggota untuk mencari...">
+                <input type="text" id="searchInput" class="form-control" placeholder="Ketik nama, ID, atau email untuk mencari...">
             </div>
-             @if(session('success'))
+            @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
             <table class="table table-hover">
@@ -21,13 +21,12 @@
                     <tr>
                         <th>ID Anggota</th>
                         <th>Nama</th>
-                        <th>Jenis Simpanan</th>
-                        <th>Tanggal</th>
-                        <th class="text-end">Jumlah</th>
+                        <th>Email</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="simpananList">
-                     @include('admin.simpanan.partials.list-simpanan', ['semuaSimpanan' => $semuaSimpanan])
+                <tbody id="anggotaList">
+                    @include('admin.anggota.partials.list-anggota', ['anggota' => $anggota])
                 </tbody>
             </table>
         </div>
@@ -37,19 +36,19 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
-    const simpananList = document.getElementById('simpananList');
-    const searchUrl = "{{ route('admin.simpanan.search') }}";
+    const anggotaList = document.getElementById('anggotaList');
+    const searchUrl = "{{ route('admin.anggota.search') }}";
     let searchTimeout;
 
     searchInput.addEventListener('keyup', function () {
         const query = searchInput.value;
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            simpananList.innerHTML = '<tr><td colspan="5" class="text-center">Mencari...</td></tr>';
+            anggotaList.innerHTML = '<tr><td colspan="4" class="text-center">Mencari...</td></tr>';
             fetch(`${searchUrl}?query=${query}`)
                 .then(response => response.text())
                 .then(html => {
-                    simpananList.innerHTML = html;
+                    anggotaList.innerHTML = html;
                 });
         }, 300);
     });

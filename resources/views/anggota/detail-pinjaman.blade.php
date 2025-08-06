@@ -9,13 +9,13 @@
                     <h5 class="mb-0">Detail Pinjaman Anda</h5>
                 </div>
                 <div class="card-body">
-                    <strong>ID Anggota:</strong> {{ $pinjaman->user->id_anggota }} <br>
-                    <strong>Nama:</strong> {{ $pinjaman->user->nama }} <br>
-                    <strong>Total Pinjaman:</strong> Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} <br>
+                    <strong>Pinjaman Pokok:</strong> Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} <br>
+                    <strong>Bunga (10%):</strong> Rp {{ number_format($pinjaman->jumlah_pinjaman * $pinjaman->persentase_bunga, 0, ',', '.') }} <br>
+                    <strong>Total Tagihan:</strong> Rp {{ number_format($pinjaman->total_tagihan, 0, ',', '.') }} <br>
                     <strong>Tenor:</strong> {{ $pinjaman->tenor }} bulan <br>
                     <strong>Angsuran / Bulan:</strong> Rp {{ number_format($angsuranPerBulan, 0, ',', '.') }} <br>
                     <hr>
-                    <strong class="text-danger">Sisa Pinjaman: Rp {{ number_format($sisaPinjaman, 0, ',', '.') }}</strong>
+                    <strong class="text-danger">Sisa Tagihan: Rp {{ number_format($sisaPinjaman, 0, ',', '.') }}</strong>
                 </div>
             </div>
              <a href="{{ route('anggota.pinjaman.riwayat') }}" class="btn btn-secondary mt-3">Kembali ke Riwayat</a>

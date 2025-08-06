@@ -1,54 +1,62 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Daftar Pengajuan Pinjaman Masuk</h5>
-        </div>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">Proses Pengajuan Pinjaman</h3>
+        <span class="badge bg-warning-subtle text-warning-emphasis fs-6">
+            {{ $daftarPengajuan->count() }} Pengajuan Menunggu
+        </span>
+    </div>
+
+    <div class="card shadow-sm border-0">
         <div class="card-body">
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control bg-light border-0" placeholder="Ketik nama atau ID anggota untuk mencari...">
+                </div>
+            </div>
+
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID Anggota</th>
-                            <th>Nama Anggota</th>
-                            <th>Tgl Pengajuan</th>
-                            <th class="text-end">Jumlah</th>
-                            <th>Tenor</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($daftarPengajuan as $pengajuan)
-                            <tr>
-                                <td>{{ $pengajuan->user->id_anggota }}</td>
-                                <td>{{ $pengajuan->user->nama }}</td>
-                                <td>{{ \Carbon\Carbon::parse($pengajuan->tanggal_pengajuan)->format('d M Y') }}</td>
-                                <td class="text-end">{{ number_format($pengajuan->jumlah_pinjaman, 0, ',', '.') }}</td>
-                                <td>{{ $pengajuan->tenor }} bulan</td>
-                                <td>
-                                    <form action="{{ route('admin.pinjaman.proses', $pengajuan->id) }}" method="POST">
-                                        @csrf
-                                        <div class="btn-group">
-                                            <button type="submit" name="status" value="disetujui" class="btn btn-sm btn-success">Setujui</button>
-                                            <button type="submit" name="status" value="ditolak" class="btn btn-sm btn-danger">Tolak</button>
-                                        </div>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center text-muted">Tidak ada pengajuan pinjaman baru.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+
+            <div class="list-group" id="pengajuanList">
+                {{-- Memuat daftar awal saat halaman dibuka --}}
+                @include('admin.pinjaman.partials.list-pengajuan', ['daftarPengajuan' => $daftarPengajuan])
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const pengajuanList = document.getElementById('pengajuanList');
+    const searchUrl = "{{ route('admin.pinjaman.search') }}";
+
+    let searchTimeout;
+
+    searchInput.addEventListener('keyup', function () {
+        const query = searchInput.value;
+        
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(() => {
+            pengajuanList.innerHTML = '<p class="text-center text-muted py-5">Mencari...</p>';
+
+            fetch(`${searchUrl}?query=${query}`)
+                .then(response => response.text())
+                .then(html => {
+                    pengajuanList.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    pengajuanList.innerHTML = '<p class="text-center text-danger py-5">Terjadi kesalahan.</p>';
+                });
+        }, 300);
+    });
+});
+</script>
 @endsection

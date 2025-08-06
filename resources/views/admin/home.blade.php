@@ -50,7 +50,7 @@
 
         {{-- Pinjaman Aktif --}}
         <div class="col-md-3 mb-4">
-            <a href="{{ route('admin.pinjaman.pengajuan') }}" class="text-decoration-none">
+            <a href="{{ route('admin.pinjaman.semua') }}" class="text-decoration-none">
                 <div class="card shadow-sm border-start-info h-100 hover-shadow">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -69,7 +69,7 @@
 
         {{-- Pengajuan Menunggu --}}
         <div class="col-md-3 mb-4">
-            <a href="{{ route('admin.pinjaman.semua') }}" class="text-decoration-none">
+            <a href="{{ route('admin.pinjaman.pengajuan') }}" class="text-decoration-none">
                 <div class="card shadow-sm border-start-warning h-100 hover-shadow">
                     <div class="card-body">
                         <div class="row align-items-center">

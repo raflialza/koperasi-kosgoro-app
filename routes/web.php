@@ -61,18 +61,22 @@ Route::middleware(['auth', 'role:anggota'])->prefix('anggota')->name('anggota.')
 */
 Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('admin.')->group(function () {
     // Kelola Anggota
-    Route::resource('anggota', AnggotaController::class)->parameters([
-    'anggota' => 'anggota',
-]);
+    Route::get('/anggota/search', [AnggotaController::class, 'search'])->name('anggota.search');
+    Route::resource('anggota', AnggotaController::class)->parameters(['anggota' => 'anggota',]);
+
     // Kelola Simpanan
     Route::get('/simpanan', [TransaksiController::class, 'daftarSemuaSimpanan'])->name('simpanan.index');
     Route::get('/simpanan/tambah', [TransaksiController::class, 'tambahSimpananForm'])->name('simpanan.tambah');
     Route::post('/simpanan/tambah', [TransaksiController::class, 'prosesTambahSimpanan'])->name('simpanan.proses-tambah');
+    Route::get('/simpanan/search', [TransaksiController::class, 'searchSemuaSimpanan'])->name('simpanan.search');
     
     // Kelola Pinjaman
     Route::get('/pinjaman/pengajuan', [TransaksiController::class, 'daftarPengajuanPinjaman'])->name('pinjaman.pengajuan');
     Route::post('/pinjaman/pengajuan/{id}/proses', [TransaksiController::class, 'prosesPengajuan'])->name('pinjaman.proses');
     Route::get('/pinjaman/semua', [TransaksiController::class, 'daftarSemuaPinjamanAdmin'])->name('pinjaman.semua');
+    Route::post('/pinjaman/bayar-massal', [TransaksiController::class, 'prosesPembayaranMassal'])->name('pinjaman.bayar-massal');
+    Route::get('/pinjaman/pengajuan/search', [TransaksiController::class, 'searchPengajuan'])->name('pinjaman.search');
+    Route::get('/pinjaman/semua/search', [TransaksiController::class, 'searchSemuaPinjaman'])->name('pinjaman.semua.search');
     
     // Pembayaran Angsuran
     Route::get('/pinjaman/{id}/bayar', [TransaksiController::class, 'pembayaranAngsuranForm'])->name('pinjaman.bayar');

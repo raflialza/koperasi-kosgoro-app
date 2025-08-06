@@ -1,60 +1,135 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Manajemen Semua Pinjaman</h5>
+<div class="container py-4">
+    <!-- Header Halaman -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">Manajemen Pinjaman Anggota</h3>
+        <a href="{{ route('admin.laporan.pinjaman') }}" target="_blank" class="btn btn-outline-secondary d-flex align-items-center">
+            <i class="bi bi-printer-fill me-2"></i>
+            Cetak Laporan
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0 pt-3 pb-0">
+            <!-- Navigasi Tab -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link {{ $status == 'aktif' ? 'active' : '' }}" href="{{ route('admin.pinjaman.semua', ['status' => 'aktif']) }}">
+                        <i class="bi bi-play-circle-fill me-2"></i>Aktif
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $status == 'lunas' ? 'active' : '' }}" href="{{ route('admin.pinjaman.semua', ['status' => 'lunas']) }}">
+                        <i class="bi bi-check-circle-fill me-2"></i>Lunas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $status == 'menunggu' ? 'active' : '' }}" href="{{ route('admin.pinjaman.semua', ['status' => 'menunggu']) }}">
+                        <i class="bi bi-hourglass-split me-2"></i>Menunggu
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.pinjaman.semua', ['status' => 'ditolak']) }}">
+                        <i class="bi bi-x-circle-fill me-2"></i>Ditolak
+                    </a>
+                </li>
+            </ul>
         </div>
+
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID Anggota</th>
-                            <th>Nama</th>
-                            <th>Tgl Disetujui</th>
-                            <th class="text-end">Jumlah</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($semuaPinjaman as $pinjaman)
-                            <tr>
-                                <td>{{ $pinjaman->user->id_anggota }}</td>
-                                <td>{{ $pinjaman->user->nama }}</td>
-                                <td>{{ $pinjaman->tanggal_disetujui ? \Carbon\Carbon::parse($pinjaman->tanggal_disetujui)->format('d M Y') : '-' }}</td>
-                                <td class="text-end">{{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
-                                <td>
-                                    @if($pinjaman->status == 'disetujui')
-                                        <span class="badge bg-success">Disetujui</span>
-                                    @elseif($pinjaman->status == 'ditolak')
-                                        <span class="badge bg-danger">Ditolak</span>
-                                    @elseif($pinjaman->status == 'lunas')
-                                        <span class="badge bg-info">Lunas</span>
-                                    @elseif($pinjaman->status == 'menunggu')
-                                        <span class="badge bg-warning">Menunggu</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($pinjaman->status == 'disetujui' || $pinjaman->status == 'berjalan')
-                                        {{-- Mengarahkan ke halaman pembayaran --}}
-                                        <a href="{{ route('admin.pinjaman.bayar', $pinjaman->id) }}" class="btn btn-sm btn-primary">Bayar Angsuran</a>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center text-muted">Tidak ada data pinjaman.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+            <form action="{{ route('admin.pinjaman.bayar-massal') }}" method="POST" id="form-bayar-massal">
+                @csrf
+                <!-- Header Aksi & Pencarian -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="input-group" style="max-width: 300px;">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control bg-light border-0" placeholder="Ketik nama atau ID anggota...">
+                    </div>
+                    @if($status == 'aktif')
+                    <button type="submit" class="btn btn-success" id="tombol-bayar-massal" disabled>
+                        <i class="bi bi-check2-circle me-2"></i>Bayar Angsuran Terpilih
+                    </button>
+                    @endif
+                </div>
+
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                
+                <!-- Daftar Pinjaman dengan Scroll -->
+                <div class="list-group" id="pinjamanList" style="max-height: 600px; overflow-y: auto;">
+                    {{-- Memuat daftar awal saat halaman dibuka --}}
+                    @include('admin.pinjaman.partials.list-semua-pinjaman', ['semuaPinjaman' => $semuaPinjaman, 'status' => $status])
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const pinjamanList = document.getElementById('pinjamanList');
+    const searchUrl = "{{ route('admin.pinjaman.semua.search') }}";
+    const currentStatus = "{{ $status }}";
+
+    let searchTimeout;
+
+    searchInput.addEventListener('keyup', function () {
+        const query = searchInput.value;
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            pinjamanList.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            fetch(`${searchUrl}?query=${query}&status=${currentStatus}`)
+                .then(response => response.text())
+                .then(html => {
+                    pinjamanList.innerHTML = html;
+                    initializeCheckboxes();
+                });
+        }, 300);
+    });
+
+    function initializeCheckboxes() {
+        const pilihSemuaCheckbox = document.getElementById('pilih-semua');
+        const pilihPinjamanCheckboxes = document.querySelectorAll('.pilih-pinjaman');
+        const tombolBayarMassal = document.getElementById('tombol-bayar-massal');
+
+        function toggleTombolBayar() {
+            if (!tombolBayarMassal) return;
+            const adaYangDipilih = Array.from(pilihPinjamanCheckboxes).some(cb => cb.checked);
+            tombolBayarMassal.disabled = !adaYangDipilih;
+        }
+
+        if (pilihSemuaCheckbox) {
+            pilihSemuaCheckbox.addEventListener('change', function () {
+                const isChecked = this.checked;
+                pilihPinjamanCheckboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+                // (PERBAIKAN) Panggil fungsi ini setelah "Pilih Semua" diklik
+                toggleTombolBayar();
+            });
+        }
+        
+        pilihPinjamanCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Saat checkbox individual diubah, periksa status tombol
+                toggleTombolBayar();
+
+                // (TAMBAHAN) Sinkronkan status "Pilih Semua"
+                if (pilihSemuaCheckbox) {
+                    const semuaDipilih = Array.from(pilihPinjamanCheckboxes).every(cb => cb.checked);
+                    pilihSemuaCheckbox.checked = semuaDipilih;
+                }
+            });
+        });
+
+        toggleTombolBayar();
+    }
+
+    initializeCheckboxes();
+});
+</script>
 @endsection

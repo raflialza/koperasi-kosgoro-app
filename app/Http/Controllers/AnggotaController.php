@@ -30,7 +30,7 @@ class AnggotaController extends Controller
 
         $anggota = $query->get();
 
-        return view('admin.kelola-anggota', compact('anggota'));
+        return view('admin.anggota.kelola-anggota', compact('anggota'));
     }
 
     public function create()
@@ -117,5 +117,21 @@ class AnggotaController extends Controller
         $anggota->delete();
 
     return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil dihapus.');
+    }
+
+    // app/Http/Controllers/AnggotaController.php
+    public function search(Request $request)
+    {
+        $query = $request->get('query', '');
+        $anggota = User::where('role', 'anggota')
+            ->where(function ($q) use ($query) {
+                $q->where('nama', 'LIKE', "%{$query}%")
+                ->orWhere('id_anggota', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%");
+            })
+            ->latest()
+            ->get();
+        
+        return view('admin.anggota.partials.list-anggota', compact('anggota'));
     }
 }

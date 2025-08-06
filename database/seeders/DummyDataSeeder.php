@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Simpanan; // <-- Tambahkan ini untuk memanggil model Simpanan
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Pinjaman;
 
 class DummyDataSeeder extends Seeder
 {
@@ -23,7 +23,7 @@ class DummyDataSeeder extends Seeder
             'tahun_gabung' => now()->year,
         ]);
 
-        $admin = User::updateOrCreate(['id_anggota' => 'ADM002'], [
+        User::updateOrCreate(['id_anggota' => 'ADM002'], [
             'nama' => 'Admin',
             'email' => 'admin@email.com',
             'password' => Hash::make('password'),
@@ -52,7 +52,6 @@ class DummyDataSeeder extends Seeder
             ['nama' => 'Ridigion', 'email' => 'ridigion.warrior@email.com'],
             ['nama' => 'Muden Nidelk', 'email' => 'muden.nidelk@email.com'],
 
-            // ... (Karakter lainnya tetap sama)
             // Magic Academy Genius Blinker (5)
             ['nama' => 'Baek Yu Seol', 'email' => 'baek.yuseol@email.com'],
             ['nama' => 'Hong Bi Yeon', 'email' => 'hong.biyeon@email.com'],
@@ -103,8 +102,7 @@ class DummyDataSeeder extends Seeder
 
         $idCounter = 1;
         foreach ($anggotaList as $data) {
-            // 1. Buat pengguna dan simpan dalam variabel
-            $user = User::updateOrCreate(
+            User::updateOrCreate(
                 ['email' => $data['email']],
                 [
                     'id_anggota'      => 'AGT' . str_pad($idCounter++, 3, '0', STR_PAD_LEFT),
@@ -115,7 +113,44 @@ class DummyDataSeeder extends Seeder
                     'instansi'        => collect(['SMP', 'SMA', 'SMK'])->random(),
                     'no_telp'         => '08' . rand(111111111, 999999999),
                     'tahun_gabung'    => rand(2020, 2024),
-            ]);
-        }
+                ]
+                
+            );
+            $this->command->info('Membuat 30 data pengajuan pinjaman acak...');
+
+    // Ambil semua ID anggota yang ada
+    $anggotaIds = User::where('role', 'anggota')->pluck('id');
+
+    if ($anggotaIds->isEmpty()) {
+        $this->command->error('Tidak ada anggota ditemukan untuk membuat pinjaman.');
+        return;
+    }
+
+    $keperluanList = ['Renovasi Rumah', 'Biaya Pendidikan', 'Modal Usaha', 'Kebutuhan Mendesak', 'Pembelian Kendaraan'];
+
+    for ($i = 0; $i < 30; $i++) {
+        Pinjaman::create([
+            'user_id'           => $anggotaIds->random(),
+            'jumlah_pinjaman'   => rand(10, 100) * 100000, // Pinjaman antara 1jt - 10jt
+            'persentase_bunga'  => 0.10, // Bunga 10%
+            'total_tagihan'     => 0, // Akan dihitung ulang nanti
+            'tenor'             => collect([6, 12, 18, 24])->random(), // Tenor acak
+            'keperluan'         => collect($keperluanList)->random(),
+            'tanggal_pengajuan' => now()->subDays(rand(1, 365)), // Tanggal pengajuan acak dalam setahun terakhir
+            'status'            => 'menunggu',
+        ]);
+    }
+
+    // Hitung ulang total_tagihan untuk semua pinjaman yang baru dibuat
+    Pinjaman::where('total_tagihan', 0)->where('status', 'menunggu')->cursor()->each(function ($pinjaman) {
+        $pokok = $pinjaman->jumlah_pinjaman;
+        $bunga = $pinjaman->persentase_bunga;
+        $pinjaman->total_tagihan = $pokok + ($pokok * $bunga);
+        $pinjaman->save();
+    });
+
+    $this->command->info('Selesai membuat data pengajuan pinjaman.');
+}
+        
     }
 }
