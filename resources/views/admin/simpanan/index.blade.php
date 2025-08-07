@@ -2,57 +2,101 @@
 
 @section('content')
 <div class="container py-4">
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold">Manajemen Simpanan Anggota</h5>
-            <a href="{{ route('admin.simpanan.tambah') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Tambah Simpanan
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 me-3">Kelola Simpanan Anggota</h4>
+        <div class="d-flex align-items-center flex-grow-1">
+            <div class="flex-grow-1 me-2">
+                <input type="text" class="form-control" id="searchInput" placeholder="Cari anggota..." value="{{ $search ?? '' }}">
+            </div>
+            <a href="{{ route('admin.simpanan.create') }}" class="btn btn-primary text-nowrap">
+                <i class="bi bi-plus-circle"></i> Tambah Simpanan
             </a>
         </div>
+    </div>
+
+    <div class="card shadow-sm modern-card">
         <div class="card-body">
-            <div class="mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="Ketik nama atau ID anggota untuk mencari...">
+            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                <table class="table modern-table">
+                    <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
+                        <tr>
+                            <th>ID Anggota</th>
+                            <th>Nama</th>
+                            <th class="text-end">Total Simpanan</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="anggota-simpanan-list">
+                        @include('admin.simpanan.partials.list-anggota-simpanan', ['semuaAnggota' => $semuaAnggota])
+                    </tbody>
+                </table>
             </div>
-             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID Anggota</th>
-                        <th>Nama</th>
-                        <th>Jenis Simpanan</th>
-                        <th>Tanggal</th>
-                        <th class="text-end">Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody id="simpananList">
-                     @include('admin.simpanan.partials.list-simpanan', ['semuaSimpanan' => $semuaSimpanan])
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
-    const simpananList = document.getElementById('simpananList');
-    const searchUrl = "{{ route('admin.simpanan.search') }}";
-    let searchTimeout;
+<!-- Modal untuk Detail Simpanan -->
+<div class="modal fade" id="detailSimpananModal" tabindex="-1" aria-labelledby="detailSimpananModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailSimpananModalLabel">Rincian Simpanan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Nama:</strong> <span id="modal-nama"></span></p>
+        <p class="mb-3"><strong>ID Anggota:</strong> <span id="modal-id-anggota"></span></p>
+        <table class="table">
+            <tr>
+                <td>Simpanan Pokok</td>
+                <td class="text-end fw-bold"><span id="modal-total-pokok"></span></td>
+            </tr>
+            <tr>
+                <td>Simpanan Wajib</td>
+                <td class="text-end fw-bold"><span id="modal-total-wajib"></span></td>
+            </tr>
+            <tr>
+                <td>Simpanan Sukarela</td>
+                <td class="text-end fw-bold"><span id="modal-total-sukarela"></span></td>
+            </tr>
+            <tr class="table-light">
+                <td class="fw-bold">TOTAL KESELURUHAN</td>
+                <td class="text-end fw-bold"><span id="modal-total-semua"></span></td>
+            </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+@endsection
 
-    searchInput.addEventListener('keyup', function () {
-        const query = searchInput.value;
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            simpananList.innerHTML = '<tr><td colspan="5" class="text-center">Mencari...</td></tr>';
-            fetch(`${searchUrl}?query=${query}`)
-                .then(response => response.text())
-                .then(html => {
-                    simpananList.innerHTML = html;
-                });
-        }, 300);
-    });
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // JavaScript untuk mengisi data ke dalam modal saat tombol 'View' diklik
+    const detailModal = document.getElementById('detailSimpananModal');
+    if (detailModal) {
+        detailModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const userUrl = button.getAttribute('data-url');
+            
+            // Tampilkan loading
+            const modalBody = detailModal.querySelector('.modal-body');
+            modalBody.querySelector('#modal-nama').textContent = 'Memuat...';
+            // ... (kosongkan field lain)
+
+            fetch(userUrl)
+            .then(response => response.json())
+            .then(data => {
+                modalBody.querySelector('#modal-nama').textContent = data.nama;
+                modalBody.querySelector('#modal-id-anggota').textContent = data.id_anggota;
+                modalBody.querySelector('#modal-total-pokok').textContent = data.total_pokok;
+                modalBody.querySelector('#modal-total-wajib').textContent = data.total_wajib;
+                modalBody.querySelector('#modal-total-sukarela').textContent = data.total_sukarela;
+                modalBody.querySelector('#modal-total-semua').textContent = data.total_semua;
+            });
+        });
+    }
 });
 </script>
-@endsection
+@endpush

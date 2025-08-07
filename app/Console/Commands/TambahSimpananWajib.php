@@ -9,54 +9,38 @@ use Carbon\Carbon;
 
 class TambahSimpananWajib extends Command
 {
-    /**
-     * Nama dan signature dari command.
-     * @var string
-     */
-    protected $signature = 'koperasi:tambah-simpanan-wajib';
+    protected $signature = 'simpanan:wajib';
+    protected $description = 'Menambahkan simpanan wajib bulanan untuk semua anggota yang belum membayar di bulan ini.';
 
-    /**
-     * Deskripsi dari command.
-     * @var string
-     */
-    protected $description = 'Menambahkan catatan Simpanan Wajib bulanan untuk semua anggota aktif';
-
-    /**
-     * Jalankan logika command.
-     */
     public function handle()
     {
-        $this->info('Memulai proses penambahan Simpanan Wajib...');
-
-        // Ambil semua pengguna dengan role 'anggota'
         $anggota = User::where('role', 'anggota')->get();
-        $bulanIni = Carbon::now()->startOfMonth();
-        $jumlahSimpananWajib = 100000; // Tentukan jumlah simpanan wajib di sini
+        $bulanIni = Carbon::now()->month;
+        $tahunIni = Carbon::now()->year;
+        $anggotaDitambahkan = 0;
 
         foreach ($anggota as $user) {
-            // Cek apakah anggota ini sudah memiliki simpanan wajib untuk bulan ini
-            $sudahAda = Simpanan::where('user_id', $user->id)
+            // Cek apakah anggota sudah membayar simpanan wajib bulan ini
+            $sudahBayar = Simpanan::where('user_id', $user->id)
                                 ->where('jenis_simpanan', 'Wajib')
-                                ->whereYear('tanggal_transaksi', $bulanIni->year)
-                                ->whereMonth('tanggal_transaksi', $bulanIni->month)
+                                ->whereMonth('tanggal_transaksi', $bulanIni)
+                                ->whereYear('tanggal_transaksi', $tahunIni)
                                 ->exists();
 
-            // Jika belum ada, buat catatan baru
-            if (!$sudahAda) {
+            // HANYA JIKA BELUM BAYAR, tambahkan simpanan baru
+            if (!$sudahBayar) {
                 Simpanan::create([
-                    'user_id'           => $user->id,
-                    'jenis_simpanan'    => 'Wajib',
-                    'jumlah'            => $jumlahSimpananWajib,
-                    'tanggal_transaksi' => $bulanIni,
-                    'processed_by'      => 1, // Diasumsikan diproses oleh Super Admin (ID 1)
+                    'user_id' => $user->id,
+                    'jenis_simpanan' => 'Wajib',
+                    'jumlah' => 50000, // Jumlah simpanan wajib
+                    'tanggal_transaksi' => Carbon::now(),
+                    'keterangan' => 'Simpanan Wajib Bulanan Otomatis',
+                    'processed_by' => 1 // Diasumsikan ID 1 adalah Super Admin
                 ]);
-                $this->info("Simpanan Wajib ditambahkan untuk anggota: {$user->nama}");
-            } else {
-                $this->comment("Simpanan Wajib untuk {$user->nama} di bulan ini sudah ada.");
+                $anggotaDitambahkan++;
             }
         }
 
-        $this->info('Proses selesai.');
-        return 0;
+        $this->info("Simpanan wajib berhasil ditambahkan untuk {$anggotaDitambahkan} anggota.");
     }
 }

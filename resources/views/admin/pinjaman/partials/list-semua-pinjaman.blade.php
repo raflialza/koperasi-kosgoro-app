@@ -23,7 +23,7 @@
             </p>
         </div>
         @if($pinjaman->status == 'disetujui' || $pinjaman->status == 'berjalan' || $pinjaman->status == 'lunas')
-            <a href="{{ route('admin.pinjaman.bayar', $pinjaman->id) }}" class="btn btn-outline-primary ms-3" title="Lihat Detail">
+            <a href="{{ route('admin.pinjaman.show', $pinjaman->id) }}" class="btn btn-outline-primary ms-3" title="Lihat Detail">
                 Detail
             </a>
         @else

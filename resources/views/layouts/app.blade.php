@@ -8,6 +8,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ asset('css/modern-table.css') }}" rel="stylesheet">
     
     @stack('styles')
 
@@ -150,36 +151,38 @@
                         <i class="bi bi-people me-3"></i>Data Anggota
                     </a>
                 </li>
+                
+                <!-- === MENU TRANSAKSI BARU === -->
                 <li class="nav-item">
-                    <a href="{{ route('admin.simpanan.index') }}" class="nav-link {{ request()->routeIs('admin.simpanan.*') ? 'active' : '' }}">
-                        <i class="bi bi-wallet2 me-3"></i>Kelola Simpanan
+                    <a class="nav-link {{ request()->routeIs('admin.simpanan.*') || request()->routeIs('admin.pinjaman.*') || request()->routeIs('admin.transaksi.*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#transaksiSubMenu" role="button" aria-expanded="{{ request()->routeIs('admin.simpanan.*') || request()->routeIs('admin.pinjaman.*') || request()->routeIs('admin.transaksi.*') ? 'true' : 'false' }}">
+                        <i class="bi bi-cash-coin me-3"></i>Transaksi
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.pinjaman.*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#pinjamanSubMenu" role="button" aria-expanded="{{ request()->routeIs('admin.pinjaman.*') ? 'true' : 'false' }}">
-                        <i class="bi bi-cash-coin me-3"></i>Kelola Pinjaman
-                    </a>
-                    <div class="collapse {{ request()->routeIs('admin.pinjaman.*') ? 'show' : '' }}" id="pinjamanSubMenu">
+                    <div class="collapse {{ request()->routeIs('admin.simpanan.*') || request()->routeIs('admin.pinjaman.*') || request()->routeIs('admin.transaksi.*') ? 'show' : '' }}" id="transaksiSubMenu">
                         <ul class="nav flex-column">
+                            <li class="nav-item"><a href="{{ route('admin.transaksi.semua') }}" class="nav-link {{ request()->routeIs('admin.transaksi.semua') ? 'fw-bold' : '' }}">Semua Transaksi</a></li>
+                            <li class="nav-item"><a href="{{ route('admin.simpanan.index') }}" class="nav-link {{ request()->routeIs('admin.simpanan.*') ? 'fw-bold' : '' }}">Kelola Simpanan</a></li>
                             <li class="nav-item"><a href="{{ route('admin.pinjaman.pengajuan') }}" class="nav-link {{ request()->routeIs('admin.pinjaman.pengajuan') ? 'fw-bold' : '' }}">Proses Pengajuan</a></li>
-                            <li class="nav-item"><a href="{{ route('admin.pinjaman.semua') }}" class="nav-link {{ request()->routeIs('admin.pinjaman.semua') ? 'fw-bold' : '' }}">Semua Pinjaman</a></li>
+                            <li class="nav-item"><a href="{{ route('admin.pinjaman.index') }}" class="nav-link {{ request()->routeIs('admin.pinjaman.index') ? 'fw-bold' : '' }}">Semua Pinjaman</a></li>
                         </ul>
                     </div>
                 </li>
+                <!-- === AKHIR MENU TRANSAKSI === -->
+
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#laporanSubMenu" role="button" aria-expanded="{{ request()->routeIs('admin.laporan.*') ? 'true' : 'false' }}">
                         <i class="bi bi-file-earmark-text me-3"></i>Laporan
                     </a>
                     <div class="collapse {{ request()->routeIs('admin.laporan.*') ? 'show' : '' }}" id="laporanSubMenu">
                         <ul class="nav flex-column">
-                            <li class="nav-item"><a href="{{ route('admin.laporan.simpanan') }}" target="_blank" class="nav-link">Laporan Simpanan</a></li>
-                            <li class="nav-item"><a href="{{ route('admin.laporan.pinjaman') }}" target="_blank" class="nav-link">Laporan Pinjaman</a></li>
+                            <li class="nav-item"><a href="{{ route('admin.laporan.simpanan.pdf') }}" target="_blank" class="nav-link">Laporan Simpanan</a></li>
+                            <li class="nav-item"><a href="{{ route('admin.laporan.pinjaman.pdf') }}" target="_blank" class="nav-link">Laporan Pinjaman</a></li>
                         </ul>
                     </div>
                 </li>
             @endif
         </ul>
     </nav>
+
 
     <div class="content-overlay" id="contentOverlay"></div>
 

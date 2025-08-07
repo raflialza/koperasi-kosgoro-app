@@ -1,19 +1,50 @@
-@forelse ($anggota as $user)
+{{-- File ini HANYA berisi baris-baris tabel (tr) --}}
+@forelse ($anggota as $item)
     <tr>
-        <td>{{ $user->id_anggota }}</td>
-        <td>{{ $user->nama }}</td>
-        <td>{{ $user->email }}</td>
+        <td><strong>{{ $item->id_anggota }}</strong></td>
+        <td>{{ $item->nama }}</td>
+        <td>{{ $item->email }}</td>
         <td>
-            <form action="{{ route('admin.anggota.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin?');">
-                <a href="{{ route('admin.anggota.edit', $user->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-            </form>
+            @php
+                $badgeColor = 'bg-secondary';
+                if ($item->instansi == 'SMP') $badgeColor = 'bg-primary';
+                if ($item->instansi == 'SMA') $badgeColor = 'bg-success';
+                if ($item->instansi == 'SMK') $badgeColor = 'bg-warning text-dark';
+            @endphp
+            <span class="badge {{ $badgeColor }}">{{ $item->instansi }}</span>
+        </td>
+        <td>
+            <div class="d-flex">
+                <!-- Tombol Detail -->
+                <button type="button" class="btn btn-sm btn-info me-1" title="Detail"
+                    data-bs-toggle="modal"
+                    data-bs-target="#detailAnggotaModal"
+                    data-nama="{{ $item->nama }}"
+                    data-id-anggota="{{ $item->id_anggota }}"
+                    data-email="{{ $item->email }}"
+                    data-no-telp="{{ $item->no_telp }}"
+                    data-alamat="{{ $item->alamat }}"
+                    data-instansi="{{ $item->instansi }}"
+                    data-tahun-gabung="{{ $item->tahun_gabung }}">
+                    <i class="bi bi-eye-fill"></i>
+                </button>
+                <!-- Tombol Edit -->
+                <a href="{{ route('admin.anggota.edit', $item->id) }}" class="btn btn-sm btn-warning me-1 action-btn-edit" title="Edit">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+                <!-- Tombol Hapus -->
+                <form action="{{ route('admin.anggota.destroy', $item->id) }}" method="POST" class="d-inline form-delete">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </form>
+            </div>
         </td>
     </tr>
 @empty
     <tr>
-        <td colspan="4" class="text-center text-muted">Tidak ada anggota yang cocok dengan pencarian Anda.</td>
+        <td colspan="5" class="text-center">Data anggota tidak ditemukan.</td>
     </tr>
 @endforelse

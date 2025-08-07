@@ -1,29 +1,53 @@
-@forelse ($daftarPengajuan as $pengajuan)
-    <div class="list-group-item list-group-item-action d-flex flex-wrap align-items-center py-3">
-        <div class="flex-grow-1 mb-2 mb-md-0">
-            <div class="d-flex w-100 justify-content-between">
-                <h6 class="mb-1 fw-bold">{{ $pengajuan->user->nama }}</h6>
-                <small class="text-muted">{{ $pengajuan->tanggal_pengajuan->diffForHumans() }}</small>
+
+@forelse ($daftarPengajuan as $item)
+    <tr>
+        <td>
+            <strong>{{ $item->user->nama }}</strong><br>
+            <small class="text-muted">{{ $item->user->id_anggota }}</small>
+        </td>
+        <td>{{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->format('d M Y') }}</td>
+        <td>Rp{{ number_format($item->jumlah_pinjaman, 0, ',', '.') }}</td>
+        <td>{{ $item->tenor }} bulan</td>
+        <td>
+            <div class="d-flex">
+                <!-- Tombol Detail -->
+                <button type="button" class="btn btn-sm btn-info me-1" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#detailPinjamanModal"
+                    data-nama="{{ $item->user->nama }}"
+                    data-id-anggota="{{ $item->user->id_anggota }}"
+                    data-jumlah="Rp{{ number_format($item->jumlah_pinjaman, 0, ',', '.') }}"
+                    data-tenor="{{ $item->tenor }} bulan"
+                    data-keperluan="{{ $item->keperluan }}"
+                    data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->format('d M Y') }}"
+                    title="Lihat Detail">
+                    <i class="bi bi-eye-fill"></i>
+                </button>
+
+                <!-- Tombol Setujui dengan SweetAlert -->
+                <form action="{{ route('admin.pinjaman.updateStatus', $item->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" value="disetujui">
+                    <button type="button" class="btn btn-sm btn-success me-1 action-btn" data-action="menyetujui" title="Setujui">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </button>
+                </form>
+
+                <!-- Tombol Tolak dengan SweetAlert -->
+                <form action="{{ route('admin.pinjaman.updateStatus', $item->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" value="ditolak">
+                    <button type="button" class="btn btn-sm btn-danger action-btn" data-action="menolak" title="Tolak">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                </form>
             </div>
-            <p class="mb-1">
-                {{ $pengajuan->user->id_anggota }} - Mengajukan <strong>Rp {{ number_format($pengajuan->jumlah_pinjaman, 0, ',', '.') }}</strong>
-            </p>
-            <small class="text-muted">Tenor: {{ $pengajuan->tenor }} bulan | Keperluan: {{ $pengajuan->keperluan }}</small>
-        </div>
-        
-        <div class="ms-md-3 d-flex gap-2">
-            <form action="{{ route('admin.pinjaman.proses', $pengajuan->id) }}" method="POST">
-                @csrf
-                <button type="submit" name="status" value="disetujui" class="btn btn-sm btn-outline-success" title="Setujui"><i class="bi bi-check-lg"></i></button>
-            </form>
-            <form action="{{ route('admin.pinjaman.proses', $pengajuan->id) }}" method="POST">
-                @csrf
-                <button type="submit" name="status" value="ditolak" class="btn btn-sm btn-outline-danger" title="Tolak"><i class="bi bi-x-lg"></i></button>
-            </form>
-        </div>
-    </div>
+        </td>
+    </tr>
 @empty
-    <div class="text-center py-5">
-        <p class="mt-3 text-muted">Tidak ada pengajuan yang cocok dengan pencarian Anda.</p>
-    </div>
+    <tr>
+        <td colspan="5" class="text-center">Tidak ada pengajuan pinjaman yang cocok dengan pencarian Anda.</td>
+    </tr>
 @endforelse
