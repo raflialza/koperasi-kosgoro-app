@@ -8,7 +8,7 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Detail Pinjaman</h5>
-                    <a href="{{ route('admin.pinjaman.index') }}" class="btn-close" aria-label="Close"></a>
+                    <a href="{{ url()->previous() }}" class="btn-close" aria-label="Close"></a>
                 </div>
                 <div class="card-body">
                     @if (session('success'))
@@ -46,17 +46,19 @@
                     </div>
                      <p class="mb-1 mt-2"><strong>Angsuran/Bulan:</strong> Rp{{ number_format($angsuranPerBulan, 0, ',', '.') }}</p>
                     <p class="mb-1"><strong>Tenor:</strong> {{ $pinjaman->tenor }} bulan</p>
-                    <p><strong>Tgl Disetujui:</strong> {{ \Carbon\Carbon::parse($pinjaman->tanggal_disetujui)->format('d M Y') }}</p>
+                    <p><strong>Tgl Disetujui:</strong> {{ $pinjaman->tanggal_disetujui ? \Carbon\Carbon::parse($pinjaman->tanggal_disetujui)->format('d M Y') : '-' }}</p>
                     
-                    <!-- Form Pembayaran (Hanya muncul jika belum lunas) -->
-                    @if ($pinjaman->status !== 'lunas')
+                    <!-- === PERUBAHAN LOGIKA DI SINI === -->
+                    
+                    <!-- Form Pembayaran (Hanya untuk status 'disetujui') -->
+                    @if ($pinjaman->status == 'disetujui')
                         <hr>
                         <h6>Form Pembayaran Angsuran ke-{{ $angsuranKe }}</h6>
                         <form action="{{ route('admin.pinjaman.storeAngsuran', $pinjaman->id) }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="jumlah_bayar" class="form-label">Jumlah Bayar</label>
-                                <input type="number" class="form-control" id="jumlah_bayar" name="jumlah_bayar" value="{{ round($angsuranPerBulan) }}" required>
+                                <input type="number" class="form-control" id="jumlah_bayar" name="jumlah_bayar" value="{{ $jumlahBayarDefault }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="tanggal_bayar" class="form-label">Tanggal Bayar</label>
@@ -64,16 +66,21 @@
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Simpan Pembayaran</button>
                         </form>
-                    @else
+                    @elseif ($pinjaman->status == 'lunas')
                         <div class="alert alert-info text-center mt-4">
-                            Pinjaman ini sudah lunas.
+                            <i class="bi bi-check-circle-fill me-2"></i> Pinjaman ini sudah lunas.
+                        </div>
+                    @elseif ($pinjaman->status == 'ditolak')
+                        <div class="alert alert-danger text-center mt-4">
+                           <i class="bi bi-x-circle-fill me-2"></i> Pinjaman ini telah ditolak.
                         </div>
                     @endif
                 </div>
             </div>
         </div>
 
-        <!-- Kolom Kanan: Riwayat Angsuran -->
+        <!-- Kolom Kanan: Riwayat Angsuran (Hanya untuk pinjaman yang disetujui/lunas) -->
+        @if($pinjaman->status == 'disetujui' || $pinjaman->status == 'lunas')
         <div class="col-lg-7">
             <div class="card shadow-sm">
                 <div class="card-header">
@@ -107,6 +114,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </div>
 @endsection

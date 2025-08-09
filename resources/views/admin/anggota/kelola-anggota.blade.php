@@ -123,27 +123,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Konfirmasi Aksi dengan SweetAlert ---
     listBody.addEventListener('click', function(event) {
-        const editBtn = event.target.closest('.action-btn-edit');
         const deleteForm = event.target.closest('.form-delete');
 
-        if (editBtn) {
-            event.preventDefault();
-            const url = editBtn.href;
-            Swal.fire({
-                title: 'Edit Data Anggota?',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Lanjutkan!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-            });
-        }
-
+        // Konfirmasi Hapus (Konfirmasi Edit dihapus dari sini)
         if (deleteForm) {
              event.preventDefault();
              Swal.fire({

@@ -44,11 +44,11 @@
 
                         <div class="mb-3">
                             <label for="user_id" class="form-label">Pilih Anggota</label>
-                            {{-- DIUBAH: ID diubah untuk target JavaScript --}}
                             <select class="form-select" id="select-anggota" name="user_id" required>
-                                <option></option> {{-- Option kosong untuk placeholder Select2 --}}
+                                <option></option>
                                 @foreach ($anggota as $item)
-                                    <option value="{{ $item->id }}" {{ old('user_id') == $item->id ? 'selected' : '' }}>
+                                    {{-- DIUBAH: Menambahkan logika untuk memilih anggota secara otomatis --}}
+                                    <option value="{{ $item->id }}" {{ (old('user_id') == $item->id || (isset($selectedAnggotaId) && $selectedAnggotaId == $item->id)) ? 'selected' : '' }}>
                                         {{ $item->id_anggota }} - {{ $item->nama }}
                                     </option>
                                 @endforeach

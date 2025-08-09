@@ -16,16 +16,15 @@ class PinjamanController extends Controller
      */
     public function index(Request $request)
     {
-        $status = $request->query('status', 'disetujui'); // Default tab adalah 'disetujui' (Aktif)
+        $status = $request->query('status', 'disetujui');
         $search = $request->query('search', '');
 
-        // === PERBAIKAN LOGIKA QUERY ===
-        // 1. Mulai dengan query dasar
         $query = Pinjaman::with('user');
 
-        // 2. Terapkan filter berdasarkan status dari tab yang aktif
-        $query->where('status', $status);
-        // ==============================
+        // Terapkan filter berdasarkan status dari tab yang aktif
+        if ($status) {
+            $query->where('status', $status);
+        }
 
         if (!empty($search)) {
             $query->whereHas('user', function ($q) use ($search) {
@@ -36,10 +35,13 @@ class PinjamanController extends Controller
 
         $semuaPinjaman = $query->orderBy('tanggal_pengajuan', 'desc')->get();
 
+        // DIUBAH: Menambahkan deteksi AJAX
+        // Jika ini adalah permintaan dari JavaScript, kirimkan hanya bagian tabelnya
         if ($request->ajax()) {
-            return view('admin.pinjaman.partials.list-semua-pinjaman', compact('semuaPinjaman'))->render();
+            return view('admin.pinjaman.partials.list-semua-pinjaman', compact('semuaPinjaman', 'status'))->render();
         }
 
+        // Jika tidak, kirimkan halaman lengkap
         return view('admin.pinjaman.index', compact('semuaPinjaman', 'status', 'search'));
     }
 
@@ -143,19 +145,22 @@ class PinjamanController extends Controller
     }
 
     /**
-     * Memproses pembayaran angsuran untuk beberapa pinjaman sekaligus.
+     * FUNGSI BARU: Memproses pembayaran angsuran untuk beberapa pinjaman sekaligus.
      */
     public function storeAngsuranMassal(Request $request)
     {
-        $request->validate(['pinjaman_ids' => 'required|array|min:1']);
+        $request->validate([
+            'pinjaman_ids' => 'required|array|min:1',
+            'pinjaman_ids.*' => 'exists:pinjaman,id',
+        ]);
 
         $berhasil = 0;
         foreach ($request->pinjaman_ids as $pinjamanId) {
             $pinjaman = Pinjaman::with('angsuran')->find($pinjamanId);
 
+            // Pastikan pinjaman masih aktif dan belum lunas
             if ($pinjaman && $pinjaman->status == 'disetujui') {
-                $totalTagihan = $pinjaman->total_tagihan;
-                $angsuranPerBulan = $pinjaman->tenor > 0 ? round($totalTagihan / $pinjaman->tenor) : 0;
+                $angsuranPerBulan = round($pinjaman->total_tagihan / $pinjaman->tenor);
                 
                 Angsuran::create([
                     'pinjaman_id'  => $pinjaman->id,
@@ -165,8 +170,8 @@ class PinjamanController extends Controller
                     'processed_by' => Auth::id(),
                 ]);
 
-                // Cek status lunas
-                if ($pinjaman->fresh()->angsuran->sum('jumlah_bayar') >= $totalTagihan) {
+                // Cek ulang status lunas setelah pembayaran
+                if ($pinjaman->fresh()->angsuran->sum('jumlah_bayar') >= ($pinjaman->total_tagihan - 1)) {
                     $pinjaman->status = 'lunas';
                     $pinjaman->save();
                 }
@@ -174,7 +179,7 @@ class PinjamanController extends Controller
             }
         }
 
-        return redirect()->route('admin.pinjaman.index', ['status' => 'aktif'])
+        return redirect()->route('admin.pinjaman.index', ['status' => 'disetujui'])
                          ->with('success', "$berhasil angsuran berhasil dibayar secara massal.");
     }
 }

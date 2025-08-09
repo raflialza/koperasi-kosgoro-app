@@ -1,78 +1,102 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4>Edit Data Anggota</h4>
-        </div>
-        <div class="card-body">
-
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <strong>Terjadi Kesalahan:</strong>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm modern-card">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">Edit Data Anggota: {{ $anggota->nama }}</h5>
                 </div>
-            @endif
+                <div class="card-body">
 
-            <form action="{{ route('admin.anggota.update', $anggota->id) }}" method="POST">
-                @csrf
-                @method('PUT')
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                <div class="mb-3">
-                    <label for="id_anggota" class="form-label">ID Anggota</label>
-                    <input type="text" name="id_anggota" class="form-control" value="{{ $anggota->id_anggota }}" readonly>
+                    <!-- Menambahkan ID pada form -->
+                    <form action="{{ route('admin.anggota.update', ['anggota' => $anggota->id]) }}" method="POST" id="edit-anggota-form">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="nama" name="nama" value="{{ old('nama', $anggota->nama) }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Alamat Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $anggota->email) }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="no_telp" class="form-label">Nomor Telepon</label>
+                            <input type="text" class="form-control" id="no_telp" name="no_telp" value="{{ old('no_telp', $anggota->no_telp) }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="alamat" class="form-label">Alamat Lengkap</label>
+                            <textarea class="form-control" id="alamat" name="alamat" rows="3" required>{{ old('alamat', $anggota->alamat) }}</textarea>
+                        </div>
+                        
+                        <hr>
+                        <p class="text-muted">Kosongkan password jika tidak ingin mengubahnya.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password Baru</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <a href="{{ route('admin.anggota.index') }}" class="btn btn-secondary me-2">Batal</a>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="mb-3">
-                    <label for="nama" class="form-label">Nama</label>
-                    <input type="text" name="nama" class="form-control" value="{{ old('nama', $anggota->nama) }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ old('email', $anggota->email) }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="no_telp" class="form-label">No Telepon</label>
-                    <input type="text" name="no_telp" class="form-control" value="{{ old('no_telp', $anggota->no_telp) }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="alamat" class="form-label">Alamat</label>
-                    <textarea name="alamat" class="form-control" rows="2" required>{{ old('alamat', $anggota->alamat) }}</textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label for="instansi" class="form-label">Instansi</label>
-                    <select name="instansi" class="form-select" required>
-                        <option value="">-- Pilih Instansi --</option>
-                        <option value="SMP" {{ $anggota->instansi == 'SMP' ? 'selected' : '' }}>SMP</option>
-                        <option value="SMA" {{ $anggota->instansi == 'SMA' ? 'selected' : '' }}>SMA</option>
-                        <option value="SMK" {{ $anggota->instansi == 'SMK' ? 'selected' : '' }}>SMK</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="tahun_gabung" class="form-label">Tahun Bergabung</label>
-                    <input type="text" name="tahun_gabung" class="form-control" value="{{ old('tahun_gabung', $anggota->tahun_gabung) }}" required>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.anggota.index') }}" class="btn btn-secondary">Kembali</a>
-                    <button type="submit" class="btn btn-success">Simpan Perubahan</button>
-                </div>
-            </form>
-
+            </div>
         </div>
     </div>
 </div>
 @endsection
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-@include('components.sweetalert')
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editForm = document.getElementById('edit-anggota-form');
+
+    if (editForm) {
+        editForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah form dikirim langsung
+
+            Swal.fire({
+                title: 'Simpan Perubahan?',
+                text: "Pastikan data yang Anda masukkan sudah benar.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika dikonfirmasi, kirim form
+                    this.submit();
+                }
+            });
+        });
+    }
+});
+</script>
+@endpush

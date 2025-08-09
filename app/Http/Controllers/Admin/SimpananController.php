@@ -18,7 +18,7 @@ class SimpananController extends Controller
         $search = $request->query('search', '');
 
         $query = User::where('role', 'anggota')
-                     ->withSum('simpanan', 'jumlah'); // Menghitung total simpanan untuk setiap anggota
+                     ->withSum('simpanan', 'jumlah');
 
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
@@ -27,7 +27,13 @@ class SimpananController extends Controller
             });
         }
         
-        $semuaAnggota = $query->orderBy('id_anggota', 'asc')->get();
+        $semuaAnggota = $query->orderBy('nama', 'asc')->get();
+
+        // DIUBAH: Menambahkan deteksi AJAX
+        if ($request->ajax()) {
+            // Jika ini permintaan dari JavaScript, kirim HANYA baris-baris tabelnya
+            return view('admin.simpanan.partials.list-anggota-simpanan', compact('semuaAnggota'))->render();
+        }
 
         return view('admin.simpanan.index', compact('semuaAnggota', 'search'));
     }
@@ -37,7 +43,6 @@ class SimpananController extends Controller
      */
     public function show(User $user)
     {
-        // Menghitung rincian simpanan per jenis
         $simpanan = $user->simpanan->groupBy('jenis_simpanan')->map(function ($group) {
             return $group->sum('jumlah');
         });
@@ -47,7 +52,6 @@ class SimpananController extends Controller
         $totalSukarela = $simpanan->get('Sukarela', 0);
         $totalSemua = $totalPokok + $totalWajib + $totalSukarela;
 
-        // Mengembalikan data dalam format JSON yang akan dibaca oleh JavaScript
         return response()->json([
             'nama' => $user->nama,
             'id_anggota' => $user->id_anggota,
@@ -60,12 +64,11 @@ class SimpananController extends Controller
 
     /**
      * Menampilkan form untuk menambah simpanan baru.
-     * Bisa menerima ID anggota untuk pra-seleksi.
      */
     public function create(Request $request)
     {
         $anggota = User::where('role', 'anggota')->orderBy('nama', 'asc')->get();
-        $selectedAnggotaId = $request->query('anggota_id'); // Mengambil ID dari URL
+        $selectedAnggotaId = $request->query('anggota_id');
 
         return view('admin.simpanan.form-tambah', compact('anggota', 'selectedAnggotaId'));
     }

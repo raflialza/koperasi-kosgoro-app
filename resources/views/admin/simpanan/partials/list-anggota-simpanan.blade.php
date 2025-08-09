@@ -11,6 +11,8 @@
                     data-url="{{ route('admin.simpanan.show', $anggota->id) }}">
                     <i class="bi bi-eye-fill"></i>
                 </button>
+                
+                <!-- DIUBAH: Menambahkan parameter anggota_id ke route -->
                 <a href="{{ route('admin.simpanan.create', ['anggota_id' => $anggota->id]) }}" class="btn btn-sm btn-success" title="Tambah Simpanan">
                     <i class="bi bi-plus-circle"></i>
                 </a>

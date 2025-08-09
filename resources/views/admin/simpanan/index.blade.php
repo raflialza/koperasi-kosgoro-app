@@ -97,6 +97,34 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+// --- Pencarian Otomatis saat Mengetik ---
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    const listBody = document.getElementById('anggota-simpanan-list');
+
+    searchInput.addEventListener('keyup', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value;
+
+        searchTimeout = setTimeout(function() {
+            const url = `{{ route('admin.simpanan.index') }}?search=${query}`;
+            
+            listBody.innerHTML = '<tr><td colspan="4" class="text-center">Memuat...</td></tr>';
+
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                listBody.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                listBody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Gagal memuat data.</td></tr>';
+            });
+        }, 300); // Jeda 300ms
+    });
 });
 </script>
 @endpush

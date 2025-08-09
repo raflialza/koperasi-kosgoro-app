@@ -4,6 +4,15 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Semua Transaksi Koperasi</h4>
+        <!-- Form Filter -->
+        <form action="{{ route('admin.transaksi.semua') }}" method="GET">
+            <select name="jenis" class="form-select" onchange="this.form.submit()" style="width: auto;">
+                <option value="semua" {{ $jenisFilter == 'semua' ? 'selected' : '' }}>Semua Transaksi</option>
+                <option value="simpanan" {{ $jenisFilter == 'simpanan' ? 'selected' : '' }}>Pemasukan Simpanan</option>
+                <option value="angsuran" {{ $jenisFilter == 'angsuran' ? 'selected' : '' }}>Pembayaran Angsuran</option>
+                <option value="pencairan" {{ $jenisFilter == 'pencairan' ? 'selected' : '' }}>Pencairan Pinjaman</option>
+            </select>
+        </form>
     </div>
 
     <div class="card shadow-sm modern-card">
@@ -24,14 +33,13 @@
                                 <td>{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d M Y') }}</td>
                                 <td>{{ $transaksi->nama_anggota }}</td>
                                 <td>
-                                    {{-- Logika untuk Badge Berwarna --}}
-                                    @if(str_contains($transaksi->jenis, 'Simpanan'))
-                                        <span class="badge bg-success">{{ $transaksi->jenis }}</span>
-                                    @elseif($transaksi->jenis == 'Angsuran Pinjaman')
-                                        <span class="badge bg-primary">{{ $transaksi->jenis }}</span>
-                                    @else
-                                        <span class="badge bg-danger">{{ $transaksi->jenis }}</span>
-                                    @endif
+                                    @php
+                                        $badgeColor = 'bg-secondary';
+                                        if ($transaksi->tipe == 'simpanan') $badgeColor = 'bg-success';
+                                        if ($transaksi->tipe == 'angsuran') $badgeColor = 'bg-primary';
+                                        if ($transaksi->tipe == 'pencairan') $badgeColor = 'bg-danger';
+                                    @endphp
+                                    <span class="badge {{ $badgeColor }}">{{ $transaksi->jenis }}</span>
                                 </td>
                                 <td class="text-end fw-bold">
                                     {{ number_format($transaksi->jumlah, 0, ',', '.') }}
@@ -39,7 +47,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center">Belum ada transaksi yang tercatat.</td>
+                                <td colspan="4" class="text-center">Tidak ada transaksi yang cocok dengan filter ini.</td>
                             </tr>
                         @endforelse
                     </tbody>
