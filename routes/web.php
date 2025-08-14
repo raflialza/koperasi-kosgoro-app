@@ -13,7 +13,8 @@ use App\Http\Controllers\Admin\AnggotaController;
 use App\Http\Controllers\Admin\SimpananController;
 use App\Http\Controllers\Admin\PinjamanController;
 use App\Http\Controllers\Admin\LaporanController;
-use App\Http\Controllers\Admin\SemuaTransaksiController; // Pastikan baris ini ada
+use App\Http\Controllers\Admin\ShuController;
+use App\Http\Controllers\Admin\SemuaTransaksiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,7 @@ Route::middleware(['auth', 'role:anggota'])->prefix('anggota')->name('anggota.')
         Route::get('/ajukan', [TransaksiController::class, 'ajukanPinjamanForm'])->name('ajukan');
         Route::post('/ajukan', [TransaksiController::class, 'prosesAjukanPinjaman'])->name('proses_ajukan');
         Route::get('/{id}/detail', [TransaksiController::class, 'detailPinjamanAnggota'])->name('detail');
+        Route::get('/{id}/invoice', [TransaksiController::class, 'cetakInvoicePinjaman'])->name('invoice');
     });
 });
 
@@ -74,11 +76,17 @@ Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('ad
         Route::put('/{id}/status', [PinjamanController::class, 'updateStatus'])->name('updateStatus');
         Route::post('/{id}/angsuran', [PinjamanController::class, 'storeAngsuran'])->name('storeAngsuran');
         Route::post('/bayar-massal', [PinjamanController::class, 'storeAngsuranMassal'])->name('bayar-massal');
+        Route::get('/{id}/invoice', [PinjamanController::class, 'cetakInvoice'])->name('invoice');
     });
     
     Route::prefix('laporan')->name('laporan.')->group(function() {
+        Route::get('/', [LaporanController::class, 'index'])->name('index'); // Halaman filter
         Route::get('/simpanan/pdf', [LaporanController::class, 'simpananPdf'])->name('simpanan.pdf');
         Route::get('/pinjaman/pdf', [LaporanController::class, 'pinjamanPdf'])->name('pinjaman.pdf');
+        Route::get('/simpanan/pdf/keseluruhan', [LaporanController::class, 'simpananPdfKeseluruhan'])->name('simpanan.pdf.keseluruhan');
+        Route::get('/pinjaman/pdf/keseluruhan', [LaporanController::class, 'pinjamanPdfKeseluruhan'])->name('pinjaman.pdf.keseluruhan');
+        Route::get('/shu', [ShuController::class, 'index'])->name('shu.index');
+        Route::get('/shu/pdf', [ShuController::class, 'cetakPdf'])->name('shu.cetak');
     });
 
     // --- RUTE BARU UNTUK SEMUA TRANSAKSI ---

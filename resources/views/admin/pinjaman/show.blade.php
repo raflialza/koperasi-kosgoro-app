@@ -8,7 +8,9 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Detail Pinjaman</h5>
-                    <a href="{{ url()->previous() }}" class="btn-close" aria-label="Close"></a>
+                    <a href="{{ route('admin.pinjaman.invoice', $pinjaman->id) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-printer-fill me-2"></i>Cetak Invoice
+                    </a>
                 </div>
                 <div class="card-body">
                     @if (session('success'))

@@ -7,6 +7,7 @@ use App\Models\Pinjaman;
 use App\Models\Angsuran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PinjamanController extends Controller
 {
@@ -78,6 +79,14 @@ class PinjamanController extends Controller
         $totalTagihan = $pinjaman->total_tagihan;
         $totalTerbayar = $pinjaman->angsuran->sum('jumlah_bayar');
         $sisaPinjaman = $totalTagihan - $totalTerbayar;
+        
+        // === PERBAIKAN DI SINI ===
+        // Jika total terbayar melebihi tagihan karena pembulatan, anggap sisa tagihan adalah 0.
+        if ($sisaPinjaman < 0) {
+            $sisaPinjaman = 0;
+        }
+        // ==========================
+
         $angsuranPerBulan = $pinjaman->tenor > 0 ? $totalTagihan / $pinjaman->tenor : 0;
         $angsuranKe = $pinjaman->angsuran->count() + 1;
 
@@ -181,5 +190,20 @@ class PinjamanController extends Controller
 
         return redirect()->route('admin.pinjaman.index', ['status' => 'disetujui'])
                          ->with('success', "$berhasil angsuran berhasil dibayar secara massal.");
+    }
+
+    public function cetakInvoice($id)
+    {
+        // Admin bisa melihat pinjaman siapa saja, jadi tidak perlu filter user ID
+        $pinjaman = Pinjaman::with(['user', 'angsuran'])->findOrFail($id);
+        
+        $sisaPinjaman = $pinjaman->total_tagihan - $pinjaman->angsuran->sum('jumlah_bayar');
+
+        // Menggunakan view PDF yang baru dibuat untuk admin
+        $pdf = Pdf::loadView('admin.pinjaman.invoice-pdf', compact('pinjaman', 'sisaPinjaman'));
+        
+        $fileName = 'INV-' . $pinjaman->user->id_anggota . '-' . $pinjaman->id . '.pdf';
+
+        return $pdf->stream($fileName);
     }
 }

@@ -9,7 +9,8 @@
                     <h5 class="mb-0">Form Pengajuan Pinjaman</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('anggota.pinjaman.proses_ajukan') }}" method="POST">
+                    <!-- Menambahkan ID pada form -->
+                    <form action="{{ route('anggota.pinjaman.proses_ajukan') }}" method="POST" id="form-ajukan-pinjaman">
                         @csrf
                         <div class="mb-3">
                             <label for="jumlah_pinjaman" class="form-label">Jumlah Pinjaman (Rp)</label>
@@ -37,3 +38,33 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-ajukan-pinjaman');
+
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah form dikirim secara otomatis
+
+            Swal.fire({
+                title: 'Konfirmasi Pengajuan',
+                text: "Apakah Anda yakin data yang dimasukkan sudah benar?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Kirim Pengajuan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika dikonfirmasi, kirim form
+                    form.submit();
+                }
+            });
+        });
+    }
+});
+</script>
+@endpush

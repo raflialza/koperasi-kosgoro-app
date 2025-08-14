@@ -6,6 +6,7 @@ use App\Models\Simpanan;
 use App\Models\Pinjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiController extends Controller
 {
@@ -42,9 +43,15 @@ class TransaksiController extends Controller
                             ->where('user_id', Auth::id()) // Keamanan
                             ->findOrFail($id);
         
-        $sisaPinjaman = $pinjaman->total_tagihan - $pinjaman->angsuran->sum('jumlah_bayar');
+        // --- PERBAIKAN DI SINI ---
+        // Menghitung kembali data yang diperlukan oleh view
+        $totalTagihan = $pinjaman->total_tagihan;
+        $totalTerbayar = $pinjaman->angsuran->sum('jumlah_bayar');
+        $sisaPinjaman = $totalTagihan - $totalTerbayar;
+        $angsuranPerBulan = $pinjaman->tenor > 0 ? $totalTagihan / $pinjaman->tenor : 0;
 
-        return view('anggota.detail-pinjaman', compact('pinjaman', 'sisaPinjaman'));
+        // Mengirim semua data yang dibutuhkan ke view
+        return view('anggota.detail-pinjaman', compact('pinjaman', 'sisaPinjaman', 'angsuranPerBulan'));
     }
 
     /**
@@ -82,6 +89,22 @@ class TransaksiController extends Controller
         ]);
 
         return redirect()->route('anggota.pinjaman.riwayat')
-                         ->with('success', 'Pengajuan pinjaman Anda berhasil dikirim!');
+                         ->with('success', 'Pengajuan berhasil! Mohon tunggu konfirmasi dari admin.');
+    }
+
+    public function cetakInvoicePinjaman($id)
+    {
+        $pinjaman = Pinjaman::with(['user', 'angsuran'])
+                            ->where('user_id', Auth::id())
+                            ->findOrFail($id);
+        
+        $sisaPinjaman = $pinjaman->total_tagihan - $pinjaman->angsuran->sum('jumlah_bayar');
+
+        $pdf = Pdf::loadView('anggota.invoice-pinjaman-pdf', compact('pinjaman', 'sisaPinjaman'));
+        
+        // Membuat nama file yang unik, contoh: INV-AGT001-123.pdf
+        $fileName = 'INV-' . $pinjaman->user->id_anggota . '-' . $pinjaman->id . '.pdf';
+
+        return $pdf->stream($fileName);
     }
 }

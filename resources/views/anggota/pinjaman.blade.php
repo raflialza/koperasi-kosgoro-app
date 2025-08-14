@@ -1,63 +1,78 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Riwayat Transaksi Pinjaman</h5>
-            <a href="{{ route('anggota.pinjaman.ajukan') }}" class="btn btn-light">
-                <i class="bi bi-plus-circle me-2"></i>Ajukan Pinjaman
-            </a>
-        </div>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Riwayat Pinjaman Saya</h4>
+        <a href="{{ route('anggota.pinjaman.ajukan') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Ajukan Pinjaman Baru
+        </a>
+    </div>
+
+    <div class="card shadow-sm modern-card">
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tanggal Pengajuan</th>
-                        <th class="text-end">Jumlah (Rp)</th>
-                        <th>Tenor</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($daftarPinjaman as $pinjaman)
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ \Carbon\Carbon::parse($pinjaman->tanggal_pengajuan)->format('d M Y') }}</td>
-                            <td class="text-end">{{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
-                            <td>{{ $pinjaman->tenor }} bulan</td>
-                            <td>
-                                @if($pinjaman->status == 'disetujui')
-                                    <span class="badge bg-success">Disetujui</span>
-                                @elseif($pinjaman->status == 'ditolak')
-                                    <span class="badge bg-danger">Ditolak</span>
-                                @elseif($pinjaman->status == 'lunas')
-                                    <span class="badge bg-info">Lunas</span>
-                                @else
-                                    <span class="badge bg-warning">Menunggu</span>
-                                @endif
-                            </td>
-                            <td> {{-- <-- Tambah sel baru --}}
-                                @if($pinjaman->status != 'menunggu' && $pinjaman->status != 'ditolak')
-                                    <a href="{{ route('anggota.pinjaman.detail', $pinjaman->id) }}" class="btn btn-sm btn-info">Lihat Detail</a>
-                                @else
-                                    -
-                                @endif
-                            </td>
+                            <th>Tanggal Pengajuan</th>
+                            <th>Jumlah Pinjaman</th>
+                            <th>Tenor</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">Belum ada transaksi pinjaman.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse ($daftarPinjaman as $pinjaman)
+                            <tr>
+                                <td>{{ \Carbon\Carbon::parse($pinjaman->tanggal_pengajuan)->format('d M Y') }}</td>
+                                <td>Rp{{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
+                                <td>{{ $pinjaman->tenor }} bulan</td>
+                                <td>
+                                    @php
+                                        $badgeColor = 'bg-secondary';
+                                        if ($pinjaman->status == 'disetujui') $badgeColor = 'bg-success';
+                                        if ($pinjaman->status == 'menunggu') $badgeColor = 'bg-warning text-dark';
+                                        if ($pinjaman->status == 'ditolak') $badgeColor = 'bg-danger';
+                                        if ($pinjaman->status == 'lunas') $badgeColor = 'bg-info';
+                                    @endphp
+                                    <span class="badge {{ $badgeColor }}">{{ ucfirst($pinjaman->status) }}</span>
+                                </td>
+                                <td>
+                                    @if($pinjaman->status == 'disetujui' || $pinjaman->status == 'lunas')
+                                        <a href="{{ route('anggota.pinjaman.detail', $pinjaman->id) }}" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye-fill"></i> Detail
+                                        </a>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-4">Anda belum memiliki riwayat pengajuan pinjaman.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Notifikasi Sukses dengan SweetAlert ---
+    const successMessage = @json(session('success'));
+    if (successMessage) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Pengajuan Berhasil!',
+            text: 'Mohon tunggu konfirmasi dari admin.',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Baik'
+        });
+    }
+});
+</script>
+@endpush

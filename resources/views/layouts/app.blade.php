@@ -151,8 +151,6 @@
                         <i class="bi bi-people me-3"></i>Data Anggota
                     </a>
                 </li>
-                
-                <!-- === MENU TRANSAKSI BARU === -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.simpanan.*') || request()->routeIs('admin.pinjaman.*') || request()->routeIs('admin.transaksi.*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#transaksiSubMenu" role="button" aria-expanded="{{ request()->routeIs('admin.simpanan.*') || request()->routeIs('admin.pinjaman.*') || request()->routeIs('admin.transaksi.*') ? 'true' : 'false' }}">
                         <i class="bi bi-cash-coin me-3"></i>Transaksi
@@ -166,23 +164,20 @@
                         </ul>
                     </div>
                 </li>
-                <!-- === AKHIR MENU TRANSAKSI === -->
-
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#laporanSubMenu" role="button" aria-expanded="{{ request()->routeIs('admin.laporan.*') ? 'true' : 'false' }}">
                         <i class="bi bi-file-earmark-text me-3"></i>Laporan
                     </a>
                     <div class="collapse {{ request()->routeIs('admin.laporan.*') ? 'show' : '' }}" id="laporanSubMenu">
                         <ul class="nav flex-column">
-                            <li class="nav-item"><a href="{{ route('admin.laporan.simpanan.pdf') }}" target="_blank" class="nav-link">Laporan Simpanan</a></li>
-                            <li class="nav-item"><a href="{{ route('admin.laporan.pinjaman.pdf') }}" target="_blank" class="nav-link">Laporan Pinjaman</a></li>
+                            <li class="nav-item"><a href="{{ route('admin.laporan.index') }}" class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'fw-bold' : '' }}">Laporan Transaksi</a></li>
+                            <li class="nav-item"><a href="{{ route('admin.laporan.shu.index') }}" class="nav-link {{ request()->routeIs('admin.laporan.shu.index') ? 'fw-bold' : '' }}">Laporan SHU</a></li>
                         </ul>
                     </div>
                 </li>
             @endif
         </ul>
     </nav>
-
 
     <div class="content-overlay" id="contentOverlay"></div>
 
