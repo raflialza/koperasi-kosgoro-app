@@ -24,6 +24,19 @@
                                 <i class="bi bi-people-fill fs-2 text-gray-300"></i>
                             </div>
                         </div>
+                        {{-- Progress Bar Anggota --}}
+                        <div class="mt-3">
+                            @php
+                                $maxAnggota = 50;
+                                $progressAnggota = ($jumlahAnggota / $maxAnggota) * 100;
+                            @endphp
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $progressAnggota }}%" aria-valuenow="{{ $jumlahAnggota }}" aria-valuemin="0" aria-valuemax="{{ $maxAnggota }}"></div>
+                            </div>
+                            <div class="text-end text-muted mt-1" style="font-size: 0.8rem;">
+                                {{ number_format($progressAnggota, 0) }}% dari {{ $maxAnggota }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </a>
@@ -43,6 +56,19 @@
                                 <i class="bi bi-wallet-fill fs-2 text-gray-300"></i>
                             </div>
                         </div>
+                        {{-- Progress Bar Simpanan --}}
+                        <div class="mt-3">
+                            @php
+                                $maxSimpanan = 50000000;
+                                $progressSimpanan = ($totalSimpanan / $maxSimpanan) * 100;
+                            @endphp
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $progressSimpanan }}%" aria-valuenow="{{ $totalSimpanan }}" aria-valuemin="0" aria-valuemax="{{ $maxSimpanan }}"></div>
+                            </div>
+                            <div class="text-end text-muted mt-1" style="font-size: 0.8rem;">
+                                {{ number_format($progressSimpanan, 0) }}% dari Rp 50 Juta
+                            </div>
+                        </div>
                     </div>
                 </div>
             </a>
@@ -60,6 +86,19 @@
                             </div>
                             <div class="col-auto">
                                 <i class="bi bi-cash-stack fs-2 text-gray-300"></i>
+                            </div>
+                        </div>
+                        {{-- Progress Bar Pinjaman Aktif --}}
+                        <div class="mt-3">
+                            @php
+                                $maxPinjaman = 100000000;
+                                $progressPinjaman = ($totalPinjamanAktif / $maxPinjaman) * 100;
+                            @endphp
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ $progressPinjaman }}%" aria-valuenow="{{ $totalPinjamanAktif }}" aria-valuemin="0" aria-valuemax="{{ $maxPinjaman }}"></div>
+                            </div>
+                            <div class="text-end text-muted mt-1" style="font-size: 0.8rem;">
+                                {{ number_format($progressPinjaman, 0) }}% dari Rp 100 Juta
                             </div>
                         </div>
                     </div>
@@ -90,7 +129,6 @@
 @endsection
 
 @push('styles')
-
 <style>
     .border-start-primary { border-left: .25rem solid #0d6efd !important; }
     .border-start-success { border-left: .25rem solid #198754 !important; }
