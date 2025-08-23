@@ -11,7 +11,7 @@
 
   <!-- External Custom CSS -->
   <link href="{{ asset('css/login-style.css') }}" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/login-style.css') }}">
+  {{-- <link rel="stylesheet" href="{{ asset('css/login-style.css') }}"> --}}
 </head>
 <body class="login-body">
 
