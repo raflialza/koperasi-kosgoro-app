@@ -60,7 +60,7 @@ Route::middleware(['auth', 'role:anggota'])->prefix('anggota')->name('anggota.')
 */
 Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('admin.')->group(function () {
     
-    Route::resource('anggota', AnggotaController::class);
+    Route::resource('anggota', AnggotaController::class)->parameter('anggota', 'anggota');
 
     Route::get('simpanan', [SimpananController::class, 'index'])->name('simpanan.index');
     Route::get('simpanan/create', [SimpananController::class, 'create'])->name('simpanan.create');
