@@ -134,7 +134,7 @@ class AnggotaController extends Controller
 
     public function destroy(User $anggota)
     {
-        if ($anggota->pinjaman()->where('status', 'disetujui')->exists()) {
+         if ($anggota->pinjaman()->where('status', 'disetujui')->exists()) {
             return back()->with('error', 'Gagal menghapus. Anggota masih memiliki pinjaman aktif.');
         }
         

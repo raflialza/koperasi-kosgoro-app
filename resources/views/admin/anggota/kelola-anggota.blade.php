@@ -2,7 +2,19 @@
 
 @section('content')
 <div class="container py-4">
-    <!-- Baris Kontrol Atas: Judul, Search, Filter, dan Tombol Tambah -->
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0 me-3">Anggota</h4>
         <div class="d-flex align-items-center flex-grow-1">
@@ -81,6 +93,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     // --- Notifikasi Sukses dengan SweetAlert ---
     const successMessage = @json(session('success'));
+    const errorMessage = @json(session('error'));
+
     if (successMessage) {
         Swal.fire({
             toast: true,
@@ -90,6 +104,14 @@ document.addEventListener('DOMContentLoaded', function() {
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true
+        });
+    }
+
+    if (errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops... Gagal!',
+            text: errorMessage, // Tampilkan pesan dari controller di sini
         });
     }
 
