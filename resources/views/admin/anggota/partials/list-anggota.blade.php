@@ -29,7 +29,7 @@
                     <i class="bi bi-eye-fill"></i>
                 </button>
                 {{-- Perbaikan ada di baris ini. Kita secara eksplisit memberi tahu rute bahwa kita mengirimkan parameter 'anggota' dengan nilai $item->id --}}
-                <a href="{{ route('admin.anggota.edit', ['anggota' => $item->id]) }}" class="btn btn-sm btn-warning me-1 action-btn-edit" title="Edit">
+                <a href="{{ route('admin.anggota.edit', ['anggota' => $item->id_anggota]) }}" class="btn btn-sm btn-warning me-1 action-btn-edit" title="Edit">
                     <i class="bi bi-pencil-square"></i>
                 </a>
 
