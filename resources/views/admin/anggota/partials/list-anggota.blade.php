@@ -28,11 +28,11 @@
                     data-tahun-gabung="{{ $item->tahun_gabung }}">
                     <i class="bi bi-eye-fill"></i>
                 </button>
-                <a href="{{ route('admin.anggota.edit', $item->id_anggota) }}" class="btn btn-sm btn-warning me-1 action-btn-edit" title="Edit">
+                <a href="{{ route('admin.anggota.edit', $item->id) }}" class="btn btn-sm btn-warning me-1 action-btn-edit" title="Edit">
                     <i class="bi bi-pencil-square"></i>
                 </a>
 
-                <form action="{{ route('admin.anggota.destroy', $item->id_anggota) }}" method="POST" class="d-inline form-delete">
+                <form action="{{ route('admin.anggota.destroy', $item->id) }}" method="POST" class="d-inline form-delete">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
