@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<link rel="stylesheet" href="{{ asset('css/datadiri-style.css') }}">
+<link rel="stylesheet" href="{{ secure_asset('css/datadiri-style.css') }}">
 
 <div class="container">
     <h1 class="title">Profile</h1>
@@ -11,7 +11,7 @@
         <!-- Left: Foto dan Nama -->
         <div class="profile-left">
             <div class="profile-image">
-                <img src="{{ asset('images/datadiri.jpeg') }}" alt="Profile Picture">
+                <img src="{{ secure_asset('images/datadiri.jpeg') }}" alt="Profile Picture">
             </div>
             <h2 class="name">{{ Auth::user()->nama }}</h2>
             <span class="status">Anggota Aktif</span>
