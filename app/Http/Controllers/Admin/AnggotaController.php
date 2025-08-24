@@ -10,38 +10,39 @@ use Illuminate\Validation\Rules;
 
 class AnggotaController extends Controller
 {
-    // ... (fungsi index, create, edit, update, destroy tidak perlu diubah)
 
     public function index(Request $request)
     {
         // Ambil input dari search dan filter
         $search = $request->query('search', '');
-        $instansi = $request->query('instansi', ''); // Filter baru
+        $instansi = $request->query('instansi', '');
 
         $query = User::where('role', 'anggota');
 
-        // Terapkan filter pencarian teks
+        // Terapkan filter pencarian teks (SUDAH DIPERBAIKI)
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
-                $q->where('nama', 'LIKE', "%{$search}%")
-                  ->orWhere('id_anggota', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%");
+                // Menggunakan whereRaw untuk pencarian case-insensitive (tidak peduli huruf besar/kecil)
+                $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($search) . '%'])
+                ->orWhere('id_anggota', 'LIKE', "%{$search}%") 
+                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
             });
         }
 
-        // Terapkan filter instansi
+        // Terapkan filter instansi (SUDAH DIPERBAIKI)
         if (!empty($instansi)) {
-            $query->where('instansi', $instansi);
+            // Menggunakan whereRaw agar filter instansi juga case-insensitive
+            $query->whereRaw('LOWER(instansi) = ?', [strtolower($instansi)]);
         }
 
         $anggota = $query->orderBy('id_anggota', 'asc')->get();
 
-        // Jika ini adalah permintaan AJAX, kirimkan hanya bagian tabelnya
+        // Jika ini adalah permintaan AJAX (untuk live search)
         if ($request->ajax()) {
             return view('admin.anggota.partials.list-anggota', compact('anggota'))->render();
         }
 
-        // Jika tidak, kirimkan halaman lengkap beserta nilai filter saat ini
+        // Jika tidak, kirimkan halaman lengkap
         return view('admin.anggota.kelola-anggota', compact('anggota', 'search', 'instansi'));
     }
 
