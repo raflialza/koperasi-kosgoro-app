@@ -63,6 +63,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('ad
     Route::resource('anggota', AnggotaController::class)->parameters([
         'anggota' => 'anggota'
     ]);
+    Route::get('/admin/anggota/{anggota}/edit', [AnggotaController::class, 'edit'])->name('admin.anggota.edit');
 
     Route::get('simpanan', [SimpananController::class, 'index'])->name('simpanan.index');
     Route::get('simpanan/create', [SimpananController::class, 'create'])->name('simpanan.create');
