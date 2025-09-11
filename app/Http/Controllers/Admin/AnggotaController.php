@@ -11,29 +11,40 @@ use Illuminate\Validation\Rules;
 class AnggotaController extends Controller
 {
 
-    public function index(Request $request)
+        public function index(Request $request)
     {
+        // Ambil input dari search dan filter
+        $search = $request->query('search', '');
+        $instansi = $request->query('instansi', '');
+
         $query = User::where('role', 'anggota');
 
-        if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%');
+        // Terapkan filter pencarian teks (SUDAH DIPERBAIKI)
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                // Menggunakan whereRaw untuk pencarian case-insensitive (tidak peduli huruf besar/kecil)
+                $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($search) . '%'])
+                ->orWhere('id_anggota', 'LIKE', "%{$search}%") 
+                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
+            });
         }
 
-        if ($request->filled('instansi')) {
-            $query->where('instansi', $request->instansi);
+        // Terapkan filter instansi (SUDAH DIPERBAIKI)
+        if (!empty($instansi)) {
+            // Menggunakan whereRaw agar filter instansi juga case-insensitive
+            $query->whereRaw('LOWER(instansi) = ?', [strtolower($instansi)]);
         }
 
-        $anggota = $query->paginate(10);
+        $anggota = $query->orderBy('id_anggota', 'asc')->get();
 
-        // Jika ini adalah request AJAX, kembalikan hanya bagian tabelnya
+        // Jika ini adalah permintaan AJAX (untuk live search)
         if ($request->ajax()) {
             return view('admin.anggota.partials.list-anggota', compact('anggota'))->render();
         }
 
-        // Jika bukan, kembalikan halaman lengkap
-        return view('admin.anggota.kelola-anggota', compact('anggota'));
+        // Jika tidak, kirimkan halaman lengkap
+        return view('admin.anggota.kelola-anggota', compact('anggota', 'search', 'instansi'));
     }
-
     public function create()
     {
         return view('admin.anggota.form-anggota');

@@ -90,6 +90,8 @@
 
 @push('scripts')
 <script>
+
+    
 document.addEventListener('DOMContentLoaded', function() {
     // --- Notifikasi Sukses dengan SweetAlert ---
     const successMessage = @json(session('success'));
