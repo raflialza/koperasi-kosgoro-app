@@ -14,7 +14,7 @@ return [
     | persist session data. Database storage is a great default choice.
     |
     | Supported: "file", "cookie", "database", "memcached",
-    |            "redis", "dynamodb", "array"
+    |           "redis", "dynamodb", "array"
     |
     */
 
@@ -32,9 +32,9 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    'lifetime' => (int) env('SESSION_LIFETIME', 5), // <-- Diubah menjadi 5 menit
 
-    'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
+    'expire_on_close' => false, // <-- Disesuaikan agar tidak membingungkan, karena tidak berfungsi dengan driver database
 
     /*
     |--------------------------------------------------------------------------
