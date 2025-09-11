@@ -12,39 +12,63 @@ class AnggotaController extends Controller
 {
 
     public function index(Request $request)
-    {
+{
+    try {
+        // Log request untuk debugging
+        \Log::info('Anggota search request', [
+            'search' => $request->query('search', ''),
+            'instansi' => $request->query('instansi', ''),
+            'is_ajax' => $request->ajax()
+        ]);
+
         // Ambil input dari search dan filter
         $search = $request->query('search', '');
         $instansi = $request->query('instansi', '');
 
         $query = User::where('role', 'anggota');
 
-        // Terapkan filter pencarian teks (SUDAH DIPERBAIKI)
+        // Terapkan filter pencarian teks
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
-                // Menggunakan whereRaw untuk pencarian case-insensitive (tidak peduli huruf besar/kecil)
                 $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($search) . '%'])
                 ->orWhere('id_anggota', 'LIKE', "%{$search}%") 
                 ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
             });
         }
 
-        // Terapkan filter instansi (SUDAH DIPERBAIKI)
+        // Terapkan filter instansi
         if (!empty($instansi)) {
-            // Menggunakan whereRaw agar filter instansi juga case-insensitive
             $query->whereRaw('LOWER(instansi) = ?', [strtolower($instansi)]);
         }
 
         $anggota = $query->orderBy('id_anggota', 'asc')->get();
 
-        // Jika ini adalah permintaan AJAX (untuk live search)
+        \Log::info('Anggota query result', ['count' => $anggota->count()]);
+
+        // Jika ini adalah permintaan AJAX
         if ($request->ajax()) {
-            return view('admin.anggota.partials.list-anggota', compact('anggota'))->render();
+            $view = view('admin.anggota.partials.list-anggota', compact('anggota'))->render();
+            \Log::info('AJAX response generated successfully');
+            return $view;
         }
 
         // Jika tidak, kirimkan halaman lengkap
         return view('admin.anggota.kelola-anggota', compact('anggota', 'search', 'instansi'));
+
+    } catch (\Exception $e) {
+        \Log::error('Error in AnggotaController@index', [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json(['error' => 'Gagal memuat data: ' . $e->getMessage()], 500);
+        }
+
+        return back()->with('error', 'Gagal memuat data');
     }
+}
 
     public function create()
     {
