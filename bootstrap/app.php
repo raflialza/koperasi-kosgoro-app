@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
 
+        // Tambahkan middleware baru di sini
+        $middleware->prepend(\App\Http\Middleware\ForceHttps::class);
+
         // Tambahkan PreventBackHistory sebagai global middleware
         $middleware->append(\App\Http\Middleware\PreventBackHistory::class);
     })
