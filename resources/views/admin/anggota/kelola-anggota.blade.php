@@ -117,48 +117,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Pencarian dan Filter AJAX ---
 let searchTimeout;
-const searchInput = document.getElementById('searchInput');
-const instansiFilter = document.getElementById('instansiFilter');
-const listBody = document.getElementById('anggota-list-body');
+    const searchInput = document.getElementById('searchInput');
+    const instansiFilter = document.getElementById('instansiFilter');
+    const listBody = document.getElementById('anggota-list-body');
 
-function fetchAnggota() {
-    const query = searchInput.value;
-    const instansi = instansiFilter.value;
-    const url = `{{ route('admin.anggota.index') }}?search=${query}&instansi=${instansi}`;
-
-    console.log('Fetching URL:', url); // Debug: log URL
-
-    listBody.innerHTML = '<tr><td colspan="5" class="text-center">Memuat...</td></tr>';
-
-    fetch(url, { 
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        credentials: 'same-origin' // Tambahkan ini untuk session/csrf
-    })
-    .then(response => {
-        console.log('Response status:', response.status); // Debug: log status
-        console.log('Response headers:', response.headers); // Debug: log headers
+    function fetchAnggota() {
+        const query = searchInput.value;
+        const instansi = instansiFilter.value;
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        return response.text();
-    })
-    .then(html => { 
-        console.log('Response HTML:', html.substring(0, 200)); // Debug: log sebagian HTML
-        listBody.innerHTML = html; 
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        listBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data: ' + error.message + '</td></tr>';
+        // ==== PERBAIKAN DI SINI ====
+        // Menggunakan URL::route() untuk memastikan URL yang dihasilkan
+        // sesuai dengan protokol (http/https) yang sedang digunakan.
+        const url = new URL("{{ route('admin.anggota.index') }}");
+        url.searchParams.append('search', query);
+        url.searchParams.append('instansi', instansi);
+        // ===========================
+
+        listBody.innerHTML = '<tr><td colspan="5" class="text-center">Memuat...</td></tr>';
+
+        fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(html => { listBody.innerHTML = html; })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            listBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data. Periksa koneksi dan coba lagi.</td></tr>';
+        });
+    }
+
+    searchInput.addEventListener('keyup', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(fetchAnggota, 300);
     });
-}
-
-searchInput.addEventListener('keyup', () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(fetchAnggota, 300);
-});
-instansiFilter.addEventListener('change', fetchAnggota);
+    instansiFilter.addEventListener('change', fetchAnggota);
 
     // --- Konfirmasi Aksi dengan SweetAlert ---
     listBody.addEventListener('click', function(event) {
