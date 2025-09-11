@@ -46,27 +46,28 @@ class PinjamanController extends Controller
         return view('admin.pinjaman.index', compact('semuaPinjaman', 'status', 'search'));
     }
 
-    public function pengajuan(Request $request)
-    {
-        $search = $request->query('search', '');
-        $query = Pinjaman::with('user')->where('status', 'menunggu');
+   public function pengajuan(Request $request)
+{
+    $search = $request->query('search', '');
+    $query = Pinjaman::with('user')
+                    ->where('status', 'menunggu')
+                    ->whereHas('user'); // Tambahkan ini untuk memastikan user exists
 
-        if (!empty($search)) {
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('nama', 'LIKE', "%{$search}%")
-                  ->orWhere('id_anggota', 'LIKE', "%{$search}%");
-            });
-        }
-
-        $daftarPengajuan = $query->latest('tanggal_pengajuan')->get();
-
-        if ($request->ajax()) {
-            // Jika ini permintaan dari JavaScript, kirim HANYA baris-baris tabelnya
-            return view('admin.pinjaman.partials.list-pengajuan', compact('daftarPengajuan'))->render();
-        }
-
-        return view('admin.pinjaman.daftar-pengajuan', compact('daftarPengajuan', 'search'));
+    if (!empty($search)) {
+        $query->whereHas('user', function ($q) use ($search) {
+            $q->where('nama', 'LIKE', "%{$search}%")
+              ->orWhere('id_anggota', 'LIKE', "%{$search}%");
+        });
     }
+
+    $daftarPengajuan = $query->latest('tanggal_pengajuan')->get();
+
+    if ($request->ajax()) {
+        return view('admin.pinjaman.partials.list-pengajuan', compact('daftarPengajuan'))->render();
+    }
+
+    return view('admin.pinjaman.daftar-pengajuan', compact('daftarPengajuan', 'search'));
+}
 
     /**
      * Menampilkan detail spesifik dari satu pinjaman.
@@ -206,4 +207,9 @@ class PinjamanController extends Controller
 
         return $pdf->stream($fileName);
     }
+    // Di Model Pinjaman
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

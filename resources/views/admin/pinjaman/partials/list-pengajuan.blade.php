@@ -2,7 +2,7 @@
 @forelse ($daftarPengajuan as $item)
     <tr>
         <td>
-            <strong>{{ $item->user->nama }}</strong><br>
+            <strong>{{ $item->user->nama ?? 'User tidak ditemukan' }}</strong><br>
             <small class="text-muted">{{ $item->user->id_anggota }}</small>
         </td>
         <td>{{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->format('d M Y') }}</td>
