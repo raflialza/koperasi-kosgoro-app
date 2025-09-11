@@ -138,6 +138,7 @@ let searchTimeout;
         fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(response => {
             if (!response.ok) {
+                console.error('Network response was not ok:', response.statusText);
                 throw new Error('Network response was not ok');
             }
             return response.text();
