@@ -20,8 +20,8 @@
                         </div>
                     @endif
 
-                    <!-- Menambahkan ID pada form -->
-                    <form action="{{ route('admin.anggota.update', ['anggota' => $anggota->id]) }}" method="POST" id="edit-anggota-form">
+                    <!-- PERBAIKAN FINAL: Menggunakan id_anggota di dalam action form -->
+                    <form action="{{ route('admin.anggota.update', ['anggota' => $anggota->id_anggota]) }}" method="POST" id="edit-anggota-form">
                         @csrf
                         @method('PUT')
 
@@ -100,3 +100,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+

@@ -11,7 +11,7 @@ use Illuminate\Validation\Rules;
 class AnggotaController extends Controller
 {
 
-        public function index(Request $request)
+    public function index(Request $request)
     {
         // Ambil input dari search dan filter
         $search = $request->query('search', '');
@@ -19,19 +19,17 @@ class AnggotaController extends Controller
 
         $query = User::where('role', 'anggota');
 
-        // Terapkan filter pencarian teks (SUDAH DIPERBAIKI)
+        // Terapkan filter pencarian teks
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
-                // Menggunakan whereRaw untuk pencarian case-insensitive (tidak peduli huruf besar/kecil)
                 $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($search) . '%'])
-                ->orWhere('id_anggota', 'LIKE', "%{$search}%") 
-                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
+                  ->orWhere('id_anggota', 'LIKE', "%{$search}%") 
+                  ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
             });
         }
 
-        // Terapkan filter instansi (SUDAH DIPERBAIKI)
+        // Terapkan filter instansi
         if (!empty($instansi)) {
-            // Menggunakan whereRaw agar filter instansi juga case-insensitive
             $query->whereRaw('LOWER(instansi) = ?', [strtolower($instansi)]);
         }
 
@@ -45,15 +43,12 @@ class AnggotaController extends Controller
         // Jika tidak, kirimkan halaman lengkap
         return view('admin.anggota.kelola-anggota', compact('anggota', 'search', 'instansi'));
     }
+    
     public function create()
     {
         return view('admin.anggota.form-anggota');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * Menyimpan data anggota baru ke database.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -66,26 +61,19 @@ class AnggotaController extends Controller
             'tahun_gabung' => ['required', 'numeric'],
         ]);
 
-        // === LOGIKA BARU UNTUK ID ANGGOTA OTOMATIS ===
-        // 1. Cari anggota terakhir yang memiliki ID dengan format 'AGT...'
         $lastAnggota = User::where('id_anggota', 'like', 'AGT%')->orderBy('id_anggota', 'desc')->first();
 
         if ($lastAnggota) {
-            // 2. Ambil nomor dari ID terakhir (misal: dari 'AGT049' menjadi 49)
             $lastNumber = (int) substr($lastAnggota->id_anggota, 3);
-            // 3. Tambahkan 1 ke nomor tersebut
             $newNumber = $lastNumber + 1;
         } else {
-            // 4. Jika belum ada anggota sama sekali, mulai dari 1
             $newNumber = 1;
         }
 
-        // 5. Format ulang nomor menjadi 3 digit dengan awalan nol (misal: 50 menjadi '050')
         $newIdAnggota = 'AGT' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-        // ===============================================
 
         User::create([
-            'id_anggota' => $newIdAnggota, // Gunakan ID baru yang sudah diformat
+            'id_anggota' => $newIdAnggota,
             'nama' => $request->nama,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -100,13 +88,24 @@ class AnggotaController extends Controller
                          ->with('success', 'Anggota baru berhasil ditambahkan.');
     }
 
-    public function edit(User $anggota)
+    /**
+     * PERUBAHAN FINAL: Mencari anggota secara manual.
+     * Menerima $id_anggota sebagai string dan mencari user di database.
+     * firstOrFail() akan otomatis menampilkan 404 jika user tidak ditemukan.
+     */
+    public function edit(string $id_anggota)
     {
+        $anggota = User::where('id_anggota', $id_anggota)->firstOrFail();
         return view('admin.anggota.edit-anggota', compact('anggota'));
     }
 
-    public function update(Request $request, User $anggota)
+    /**
+     * PERUBAHAN FINAL: Mencari anggota secara manual sebelum update.
+     */
+    public function update(Request $request, string $id_anggota)
     {
+        $anggota = User::where('id_anggota', $id_anggota)->firstOrFail();
+
         $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $anggota->id],
@@ -131,9 +130,14 @@ class AnggotaController extends Controller
                          ->with('success', 'Data anggota berhasil diperbarui.');
     }
 
-    public function destroy(User $anggota)
+    /**
+     * PERUBAHAN FINAL: Mencari anggota secara manual sebelum menghapus.
+     */
+    public function destroy(string $id_anggota)
     {
-         if ($anggota->pinjaman()->where('status', 'disetujui')->exists()) {
+        $anggota = User::where('id_anggota', $id_anggota)->firstOrFail();
+
+        if ($anggota->pinjaman()->where('status', 'disetujui')->exists()) {
             return back()->with('error', 'Gagal menghapus. Anggota masih memiliki pinjaman aktif.');
         }
         
@@ -143,3 +147,4 @@ class AnggotaController extends Controller
                          ->with('success', 'Data anggota berhasil dihapus.');
     }
 }
+

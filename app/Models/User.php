@@ -33,6 +33,18 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get the route key for the model.
+     * Ini memberitahu Laravel untuk menggunakan kolom 'id_anggota'
+     * saat mencari User dari URL, contoh: /anggota/AGT001/edit
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'id_anggota';
+    }
+
     // Helper methods untuk role
     public function isAnggota()
     {
@@ -51,21 +63,21 @@ class User extends Authenticatable
 
     public function pinjaman()
     {
-    return $this->hasMany(Pinjaman::class);
+        return $this->hasMany(Pinjaman::class);
     }
 
     public function approvedPinjaman()
     {
-    return $this->hasMany(Pinjaman::class, 'approved_by');
+        return $this->hasMany(Pinjaman::class, 'approved_by');
     }
-    // Tambahkan method ini di User.php
+
     public function simpanan()
     {
-    return $this->hasMany(Simpanan::class);
+        return $this->hasMany(Simpanan::class);
     }
 
     public function processedSimpanan()
     {
-    return $this->hasMany(Simpanan::class, 'processed_by');
+        return $this->hasMany(Simpanan::class, 'processed_by');
     }
 }

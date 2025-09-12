@@ -60,10 +60,10 @@ Route::middleware(['auth', 'role:anggota'])->prefix('anggota')->name('anggota.')
 */
 Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('admin.')->group(function () {
     
+    // Rute resource tetap dipertahankan untuk menangani update, destroy, dll.
     Route::resource('anggota', AnggotaController::class)->parameters([
         'anggota' => 'anggota'
     ]);
-    Route::get('/admin/anggota/{anggota}/edit', [AnggotaController::class, 'edit'])->name('admin.anggota.edit');
 
     Route::get('simpanan', [SimpananController::class, 'index'])->name('simpanan.index');
     Route::get('simpanan/create', [SimpananController::class, 'create'])->name('simpanan.create');
@@ -90,6 +90,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('ad
         Route::get('/shu/pdf', [ShuController::class, 'cetakPdf'])->name('shu.cetak');
     });
 
-    // --- RUTE BARU UNTUK SEMUA TRANSAKSI ---
+    // Rute untuk semua transaksi
     Route::get('semua-transaksi', [SemuaTransaksiController::class, 'index'])->name('transaksi.semua');
 });
+

@@ -1,50 +1,46 @@
-{{-- File ini HANYA berisi baris-baris tabel (tr) --}}
-@forelse ($anggota as $item)
-    <tr>
-        <td><strong>{{ $item->id_anggota }}</strong></td>
-        <td>{{ $item->nama }}</td>
-        <td>{{ $item->email }}</td>
-        <td>
-            @php
-                $badgeColor = 'bg-secondary';
-                if ($item->instansi == 'SMP') $badgeColor = 'bg-primary';
-                if ($item->instansi == 'SMA') $badgeColor = 'bg-success';
-                if ($item->instansi == 'SMK') $badgeColor = 'bg-warning text-dark';
-            @endphp
-            <span class="badge {{ $badgeColor }}">{{ $item->instansi }}</span>
-        </td>
-        <td>
-            <div class="d-flex">
-                <!-- Tombol Detail -->
-                <button type="button" class="btn btn-sm btn-info me-1" title="Detail"
-                    data-bs-toggle="modal"
+@forelse ($anggota as $a)
+<tr>
+    <td>{{ $a->id_anggota }}</td>
+    <td>{{ $a->nama }}</td>
+    <td>{{ $a->email }}</td>
+    <td>{{ $a->instansi }}</td>
+    <td>
+        <div class="d-flex">
+            <!-- Tombol Detail -->
+            <button type="button" class="btn btn-info btn-sm me-1" 
+                    data-bs-toggle="modal" 
                     data-bs-target="#detailAnggotaModal"
-                    data-nama="{{ $item->nama }}"
-                    data-id-anggota="{{ $item->id_anggota }}"
-                    data-email="{{ $item->email }}"
-                    data-no-telp="{{ $item->no_telp }}"
-                    data-alamat="{{ $item->alamat }}"
-                    data-instansi="{{ $item->instansi }}"
-                    data-tahun-gabung="{{ $item->tahun_gabung }}">
-                    <i class="bi bi-eye-fill"></i>
-                </button>
-                {{-- Perbaikan ada di baris ini. Kita secara eksplisit memberi tahu rute bahwa kita mengirimkan parameter 'anggota' dengan nilai $item->id --}}
-                <a href="{{ route('admin.anggota.edit', ['anggota' => $item->id_anggota]) }}" class="btn btn-sm btn-warning me-1 action-btn-edit" title="Edit">
-                    <i class="bi bi-pencil-square"></i>
-                </a>
+                    data-id-anggota="{{ $a->id_anggota }}"
+                    data-nama="{{ $a->nama }}"
+                    data-email="{{ $a->email }}"
+                    data-no-telp="{{ $a->no_telp }}"
+                    data-alamat="{{ $a->alamat }}"
+                    data-instansi="{{ $a->instansi }}"
+                    data-tahun-gabung="{{ $a->tahun_gabung }}">
+                <i class="bi bi-eye"></i>
+            </button>
 
-                <form action="{{ route('admin.anggota.destroy', $item->id_anggota) }}" method="POST" class="d-inline form-delete">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                </form>
-            </div>
-        </td>
-    </tr>
+            <!-- Tautan Edit -->
+            <a href="{{ route('admin.anggota.edit', ['anggota' => $a->id_anggota]) }}" class="btn btn-warning btn-sm me-1">
+                <i class="bi bi-pencil-square"></i>
+            </a>
+
+            @if (Auth::user()->role == 'super_admin')
+            <!-- Form Hapus -->
+            <form action="{{ route('admin.anggota.destroy', ['anggota' => $a->id_anggota]) }}" method="POST" class="form-delete d-inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
+            @endif
+        </div>
+    </td>
+</tr>
 @empty
-    <tr>
-        <td colspan="5" class="text-center">Data anggota tidak ditemukan.</td>
-    </tr>
+<tr>
+    <td colspan="5" class="text-center">Tidak ada data anggota ditemukan.</td>
+</tr>
 @endforelse
+
