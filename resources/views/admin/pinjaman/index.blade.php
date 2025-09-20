@@ -3,64 +3,56 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Manajemen Pinjaman Anggota</h4>
-        <a href="{{ route('admin.laporan.pinjaman.pdf') }}" target="_blank" class="btn btn-outline-secondary">
-            <i class="bi bi-printer-fill me-2"></i>Cetak Laporan
-        </a>
+        <h4 class="mb-0">Daftar Semua Pinjaman</h4>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-white border-0 pt-3">
-            <ul class="nav nav-tabs card-header-tabs">
-                <li class="nav-item">
-                    <a class="nav-link {{ $status == 'disetujui' ? 'active' : '' }}" href="{{ route('admin.pinjaman.index', ['status' => 'disetujui']) }}">
-                        Aktif
-                    </a>
+    <div class="card shadow-sm modern-card">
+        <div class="card-header bg-white border-0">
+            <!-- Navigasi Tab -->
+            <ul class="nav nav-tabs card-header-tabs" id="pinjamanTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link {{ $status == 'Disetujui' ? 'active' : '' }}" href="{{ route('admin.pinjaman.index', ['status' => 'Disetujui']) }}">Aktif</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ $status == 'lunas' ? 'active' : '' }}" href="{{ route('admin.pinjaman.index', ['status' => 'lunas']) }}">
-                        Lunas
-                    </a>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link {{ $status == 'Lunas' ? 'active' : '' }}" href="{{ route('admin.pinjaman.index', ['status' => 'Lunas']) }}">Lunas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.pinjaman.index', ['status' => 'ditolak']) }}">
-                        Ditolak
-                    </a>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link {{ $status == 'Ditolak' ? 'active' : '' }}" href="{{ route('admin.pinjaman.index', ['status' => 'Ditolak']) }}">Ditolak</a>
                 </li>
             </ul>
         </div>
         <div class="card-body">
-            @if (session('success'))
-                {{-- Notifikasi akan ditangani oleh SweetAlert --}}
-            @endif
+            <div class="d-flex justify-content-between mb-3">
+                <!-- Input Pencarian -->
+                <div class="input-group" style="width: 50%;">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Cari nama atau ID anggota..." value="{{ $search ?? '' }}">
+                </div>
+                <!-- Tombol Bayar Massal (hanya muncul di tab Aktif) -->
+                @if($status == 'Disetujui')
+                    <button type="submit" form="form-bayar-massal" class="btn btn-success" id="btn-bayar-massal" disabled>
+                        <i class="bi bi-cash-stack"></i> Bayar Angsuran Terpilih
+                    </button>
+                @endif
+            </div>
 
-            <!-- Form untuk pembayaran massal -->
+            <!-- Form untuk Bayar Massal -->
             <form action="{{ route('admin.pinjaman.bayar-massal') }}" method="POST" id="form-bayar-massal">
                 @csrf
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <input type="text" class="form-control" id="searchInput" placeholder="Ketik nama atau ID anggota..." value="{{ $search ?? '' }}" style="max-width: 400px;">
-                    
-                    <!-- Tombol Bayar Massal (hanya muncul di tab Aktif) -->
-                    @if($status == 'disetujui')
-                    <button type="submit" class="btn btn-success" id="tombol-bayar-massal" disabled>
-                        <i class="bi bi-check2-circle me-2"></i>Bayar Angsuran Terpilih
-                    </button>
-                    @endif
-                </div>
-
                 <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                    <table class="table table-hover">
+                    <table class="table modern-table table-hover">
                         <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
                             <tr>
-                                <!-- Kolom Checklist (hanya muncul di tab Aktif) -->
-                                @if($status == 'disetujui')
-                                <th style="width: 1%;"><input class="form-check-input" type="checkbox" id="pilih-semua"></th>
+                                @if($status == 'Disetujui')
+                                    <th style="width: 5%;"><input type="checkbox" id="check-all"></th>
                                 @endif
-                                <th>Anggota</th>
-                                <th>Tgl Disetujui</th>
+                                <th>ID Anggota</th>
+                                <th>Nama Anggota</th>
+                                <th>Pokok Pinjaman</th>
                                 <th>Total Tagihan</th>
+                                <th>Terbayar</th>
                                 <th>Status</th>
-                                <th>Aksi</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="pinjaman-list-body">
@@ -77,43 +69,24 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Notifikasi Sukses ---
-    const successMessage = @json(session('success'));
-    if (successMessage) {
-        Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: successMessage,
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true
-        });
-    }
-
-    // --- Variabel Global ---
-    const listBody = document.getElementById('pinjaman-list-body');
-    const searchInput = document.getElementById('searchInput');
-    const currentStatus = "{{ $status }}";
     let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    const listBody = document.getElementById('pinjaman-list-body');
+    const currentStatus = @json($status);
 
-    // --- Fungsi untuk Pencarian Otomatis ---
     function fetchPinjaman() {
         const query = searchInput.value;
-        listBody.innerHTML = '<tr><td colspan="6" class="text-center">Memuat...</td></tr>';
-        
-        fetch(`{{ route('admin.pinjaman.index') }}?status=${currentStatus}&search=${query}`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
+        const url = `{{ route('admin.pinjaman.index') }}?status=${currentStatus}&search=${query}`;
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(response => response.text())
         .then(html => {
             listBody.innerHTML = html;
-            // Inisialisasi ulang event listener untuk checkbox setelah konten baru dimuat
-            initializeCheckboxes(); 
+            attachCheckboxListeners(); // Pasang ulang listener setelah memuat ulang
         })
         .catch(error => {
             console.error('Error:', error);
-            listBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Gagal memuat data.</td></tr>';
+            listBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Gagal memuat data.</td></tr>';
         });
     }
 
@@ -122,38 +95,46 @@ document.addEventListener('DOMContentLoaded', function() {
         searchTimeout = setTimeout(fetchPinjaman, 300);
     });
 
-    // --- Fungsi untuk Checklist dan Pembayaran Massal ---
-    function initializeCheckboxes() {
-        const tombolBayarMassal = document.getElementById('tombol-bayar-massal');
-        const pilihSemuaCheckbox = document.getElementById('pilih-semua');
-        const formBayarMassal = document.getElementById('form-bayar-massal');
+    // --- Logika untuk Checkbox Pembayaran Massal ---
+    function attachCheckboxListeners() {
+        const checkAll = document.getElementById('check-all');
+        const itemChecks = document.querySelectorAll('.check-item');
+        const bayarMassalBtn = document.getElementById('btn-bayar-massal');
 
-        function toggleBayarButton() {
-            if (!tombolBayarMassal) return;
-            const terpilih = listBody.querySelectorAll('.pilih-pinjaman:checked').length > 0;
-            tombolBayarMassal.disabled = !terpilih;
+        if (!checkAll) return; // Hanya jalankan jika ada checkbox
+
+        function toggleButtonState() {
+            const anyChecked = Array.from(itemChecks).some(c => c.checked);
+            bayarMassalBtn.disabled = !anyChecked;
         }
 
-        if (pilihSemuaCheckbox) {
-            pilihSemuaCheckbox.addEventListener('change', function() {
-                const checkboxes = listBody.querySelectorAll('.pilih-pinjaman');
-                checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-                toggleBayarButton();
+        checkAll.addEventListener('change', function() {
+            itemChecks.forEach(checkbox => {
+                checkbox.checked = this.checked;
             });
-        }
-
-        listBody.addEventListener('change', function(event) {
-            if (event.target.classList.contains('pilih-pinjaman')) {
-                toggleBayarButton();
-            }
+            toggleButtonState();
         });
 
-        if (formBayarMassal) {
-            formBayarMassal.addEventListener('submit', function(event) {
-                event.preventDefault();
+        itemChecks.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    checkAll.checked = false;
+                } else if (Array.from(itemChecks).every(c => c.checked)) {
+                    checkAll.checked = true;
+                }
+                toggleButtonState();
+            });
+        });
+        
+        // --- Form Submit Confirmation ---
+        const formBayarMassal = document.getElementById('form-bayar-massal');
+        if(formBayarMassal) {
+            formBayarMassal.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const count = document.querySelectorAll('.check-item:checked').length;
                 Swal.fire({
-                    title: 'Konfirmasi Pembayaran',
-                    text: "Anda akan membayar satu angsuran untuk semua pinjaman yang dipilih. Lanjutkan?",
+                    title: `Bayar ${count} Angsuran?`,
+                    text: "Aksi ini akan mencatat satu kali angsuran untuk setiap pinjaman yang dipilih.",
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Ya, Bayar!',
@@ -167,8 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Panggil fungsi inisialisasi saat halaman pertama kali dimuat
-    initializeCheckboxes();
+    attachCheckboxListeners(); // Jalankan saat halaman pertama kali dimuat
 });
 </script>
 @endpush

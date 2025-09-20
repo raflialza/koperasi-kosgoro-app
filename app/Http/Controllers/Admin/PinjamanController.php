@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pinjaman;
 use App\Models\Angsuran;
+use App\Models\Simpanan; // Pastikan Simpanan di-import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -12,12 +13,14 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class PinjamanController extends Controller
 {
     /**
-     * Menampilkan daftar semua pinjaman dengan filter dan pencarian.
-     * Menggabungkan semua logika daftar pinjaman (aktif, lunas, menunggu, ditolak).
+     * Menampilkan daftar semua pinjaman dengan filter status dan pencarian.
+     * Metode ini sekarang menangani semua daftar pinjaman (menunggu, disetujui, ditolak, lunas).
      */
     public function index(Request $request)
     {
-        $status = $request->query('status', 'disetujui');
+        // --- PERBAIKAN DI SINI ---
+        // Mengubah status default menjadi 'Disetujui' untuk halaman "Semua Pinjaman"
+        $status = $request->query('status', 'Disetujui'); 
         $search = $request->query('search', '');
 
         $query = Pinjaman::with('user');
@@ -27,6 +30,7 @@ class PinjamanController extends Controller
             $query->where('status', $status);
         }
 
+        // Terapkan filter pencarian
         if (!empty($search)) {
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('nama', 'LIKE', "%{$search}%")
@@ -34,85 +38,67 @@ class PinjamanController extends Controller
             });
         }
 
-        $semuaPinjaman = $query->orderBy('tanggal_pengajuan', 'desc')->get();
+        $pinjaman = $query->orderBy('tanggal_pengajuan', 'desc')->get();
 
-        // DIUBAH: Menambahkan deteksi AJAX
-        // Jika ini adalah permintaan dari JavaScript, kirimkan hanya bagian tabelnya
+        // Jika ini adalah permintaan dari JavaScript (AJAX), kirimkan hanya bagian tabelnya
         if ($request->ajax()) {
-            return view('admin.pinjaman.partials.list-semua-pinjaman', compact('semuaPinjaman', 'status'))->render();
+            if ($status == 'Menunggu Persetujuan') {
+                 return view('admin.pinjaman.partials.list-pengajuan', compact('pinjaman'))->render();
+            }
+            return view('admin.pinjaman.partials.list-semua-pinjaman', ['semuaPinjaman' => $pinjaman, 'status' => $status])->render();
         }
 
         // Jika tidak, kirimkan halaman lengkap
-        return view('admin.pinjaman.index', compact('semuaPinjaman', 'status', 'search'));
+        if($status == 'Menunggu Persetujuan'){
+            return view('admin.pinjaman.daftar-pengajuan', compact('pinjaman', 'search'));
+        }
+        
+        return view('admin.pinjaman.index', ['semuaPinjaman' => $pinjaman, 'status' => $status, 'search' => $search]);
     }
-
-   public function pengajuan(Request $request)
-{
-    $search = $request->query('search', '');
-    $query = Pinjaman::with('user')
-                    ->where('status', 'menunggu')
-                    ->whereHas('user'); // Tambahkan ini untuk memastikan user exists
-
-    if (!empty($search)) {
-        $query->whereHas('user', function ($q) use ($search) {
-            $q->where('nama', 'LIKE', "%{$search}%")
-              ->orWhere('id_anggota', 'LIKE', "%{$search}%");
-        });
-    }
-
-    $daftarPengajuan = $query->latest('tanggal_pengajuan')->get();
-
-    if ($request->ajax()) {
-        return view('admin.pinjaman.partials.list-pengajuan', compact('daftarPengajuan'))->render();
-    }
-
-    return view('admin.pinjaman.daftar-pengajuan', compact('daftarPengajuan', 'search'));
-}
 
     /**
      * Menampilkan detail spesifik dari satu pinjaman.
-     * Halaman ini digunakan untuk melihat riwayat angsuran dan form pembayaran.
      */
     public function show($id)
     {
         $pinjaman = Pinjaman::with(['user', 'angsuran'])->findOrFail($id);
         
-        $totalTagihan = $pinjaman->total_tagihan;
-        $totalTerbayar = $pinjaman->angsuran->sum('jumlah_bayar');
-        $sisaPinjaman = $totalTagihan - $totalTerbayar;
-        
-        // === PERBAIKAN DI SINI ===
-        // Jika total terbayar melebihi tagihan karena pembulatan, anggap sisa tagihan adalah 0.
-        if ($sisaPinjaman < 0) {
-            $sisaPinjaman = 0;
-        }
-        // ==========================
-
+        // --- PERHITUNGAN ULANG BERDASARKAN MARGIN (DISESUAIKAN) ---
+        $pokok = $pinjaman->jumlah_pinjaman;
+        $totalMarginAmount = $pokok * ($pinjaman->margin / 100);
+        $totalTagihan = $pokok + $totalMarginAmount;
         $angsuranPerBulan = $pinjaman->tenor > 0 ? $totalTagihan / $pinjaman->tenor : 0;
-        $angsuranKe = $pinjaman->angsuran->count() + 1;
+        
+        $totalTerbayar = $pinjaman->angsuran->sum('jumlah_bayar');
+        $sisaTagihan = $totalTagihan - $totalTerbayar;
+        $persentaseTerbayar = $totalTagihan > 0 ? ($totalTerbayar / $totalTagihan) * 100 : 0;
+        
+        // Mengatasi sisa pinjaman negatif karena pembulatan
+        $sisaTagihan = max(0, $sisaTagihan);
 
-        $jumlahBayarDefault = round($angsuranPerBulan);
-        if ($sisaPinjaman > 0 && $sisaPinjaman < $jumlahBayarDefault) {
-            $jumlahBayarDefault = $sisaPinjaman;
-        }
-
-        return view('admin.pinjaman.show', compact('pinjaman', 'sisaPinjaman', 'angsuranPerBulan', 'angsuranKe', 'jumlahBayarDefault'));
+        return view('admin.pinjaman.show', compact(
+            'pinjaman', 
+            'totalTagihan', 
+            'angsuranPerBulan', 
+            'sisaTagihan',
+            'persentaseTerbayar'
+        ));
     }
 
     /**
-     * Memperbarui status pinjaman (menjadi 'disetujui' atau 'ditolak').
+     * Memperbarui status pengajuan pinjaman (menjadi 'Disetujui' atau 'Ditolak').
      */
     public function updateStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:disetujui,ditolak']);
+        $request->validate(['status' => 'required|in:Disetujui,Ditolak']);
         
         $pinjaman = Pinjaman::findOrFail($id);
         
-        if ($pinjaman->status === 'menunggu') {
+        if ($pinjaman->status === 'Menunggu Persetujuan') {
             $pinjaman->status = $request->status;
             $pinjaman->approved_by = Auth::id();
 
-            if ($request->status == 'disetujui') {
+            if ($request->status == 'Disetujui') {
                 $pinjaman->tanggal_disetujui = now();
             }
             $pinjaman->save();
@@ -136,17 +122,20 @@ class PinjamanController extends Controller
         $pinjaman = Pinjaman::with('angsuran')->findOrFail($id);
 
         Angsuran::create([
-            'pinjaman_id'   => $pinjaman->id,
-            'jumlah_bayar'  => $request->jumlah_bayar,
-            'tanggal_bayar' => $request->tanggal_bayar,
-            'angsuran_ke'   => $pinjaman->angsuran->count() + 1,
-            'processed_by'  => Auth::id(),
+            'pinjaman_id'  => $pinjaman->id,
+            'jumlah_bayar' => $request->jumlah_bayar,
+            'tanggal_bayar'=> $request->tanggal_bayar,
+            'angsuran_ke'  => $pinjaman->angsuran->count() + 1,
+            'processed_by' => Auth::id(),
         ]);
         
+        // --- PERHITUNGAN ULANG UNTUK CEK LUNAS ---
         $totalTerbayar = $pinjaman->fresh()->angsuran->sum('jumlah_bayar');
+        $totalTagihan = $pinjaman->jumlah_pinjaman + ($pinjaman->jumlah_pinjaman * ($pinjaman->margin / 100));
 
-        if ($totalTerbayar >= ($pinjaman->total_tagihan - 1)) {
-            $pinjaman->status = 'lunas';
+        // Toleransi 1 rupiah untuk pembulatan
+        if ($totalTerbayar >= ($totalTagihan - 1)) {
+            $pinjaman->status = 'Lunas';
             $pinjaman->save();
         }
 
@@ -155,7 +144,7 @@ class PinjamanController extends Controller
     }
 
     /**
-     * FUNGSI BARU: Memproses pembayaran angsuran untuk beberapa pinjaman sekaligus.
+     * Memproses pembayaran angsuran untuk beberapa pinjaman sekaligus.
      */
     public function storeAngsuranMassal(Request $request)
     {
@@ -168,9 +157,10 @@ class PinjamanController extends Controller
         foreach ($request->pinjaman_ids as $pinjamanId) {
             $pinjaman = Pinjaman::with('angsuran')->find($pinjamanId);
 
-            // Pastikan pinjaman masih aktif dan belum lunas
-            if ($pinjaman && $pinjaman->status == 'disetujui') {
-                $angsuranPerBulan = round($pinjaman->total_tagihan / $pinjaman->tenor);
+            if ($pinjaman && $pinjaman->status == 'Disetujui') {
+                // --- PERHITUNGAN ULANG UNTUK ANGSURAN MASSAL ---
+                $totalTagihan = $pinjaman->jumlah_pinjaman + ($pinjaman->jumlah_pinjaman * ($pinjaman->margin / 100));
+                $angsuranPerBulan = round($totalTagihan / $pinjaman->tenor);
                 
                 Angsuran::create([
                     'pinjaman_id'  => $pinjaman->id,
@@ -181,35 +171,35 @@ class PinjamanController extends Controller
                 ]);
 
                 // Cek ulang status lunas setelah pembayaran
-                if ($pinjaman->fresh()->angsuran->sum('jumlah_bayar') >= ($pinjaman->total_tagihan - 1)) {
-                    $pinjaman->status = 'lunas';
+                if ($pinjaman->fresh()->angsuran->sum('jumlah_bayar') >= ($totalTagihan - 1)) {
+                    $pinjaman->status = 'Lunas';
                     $pinjaman->save();
                 }
                 $berhasil++;
             }
         }
 
-        return redirect()->route('admin.pinjaman.index', ['status' => 'disetujui'])
+        return redirect()->route('admin.pinjaman.index', ['status' => 'Disetujui'])
                          ->with('success', "$berhasil angsuran berhasil dibayar secara massal.");
     }
 
+    /**
+     * Mencetak invoice pinjaman dalam format PDF.
+     */
     public function cetakInvoice($id)
     {
-        // Admin bisa melihat pinjaman siapa saja, jadi tidak perlu filter user ID
         $pinjaman = Pinjaman::with(['user', 'angsuran'])->findOrFail($id);
         
-        $sisaPinjaman = $pinjaman->total_tagihan - $pinjaman->angsuran->sum('jumlah_bayar');
+        // --- PERHITUNGAN ULANG UNTUK INVOICE ---
+        $totalTagihan = $pinjaman->jumlah_pinjaman + ($pinjaman->jumlah_pinjaman * ($pinjaman->margin / 100));
+        $sisaPinjaman = $totalTagihan - $pinjaman->angsuran->sum('jumlah_bayar');
 
-        // Menggunakan view PDF yang baru dibuat untuk admin
-        $pdf = Pdf::loadView('admin.pinjaman.invoice-pdf', compact('pinjaman', 'sisaPinjaman'));
+        $daftarSimpanan = Simpanan::where('user_id', $pinjaman->user_id)->get();
         
-        $fileName = 'INV-' . $pinjaman->user->id_anggota . '-' . $pinjaman->id . '.pdf';
-
+        $pdf = Pdf::loadView('admin.pinjaman.invoice-pdf', compact('pinjaman', 'sisaPinjaman', 'daftarSimpanan'));
+        $fileName = 'INV-ADMIN-' . $pinjaman->user->id_anggota . '-' . $pinjaman->id . '.pdf';
+        
         return $pdf->stream($fileName);
     }
-    // Di Model Pinjaman
-public function user()
-{
-    return $this->belongsTo(User::class);
 }
-}
+

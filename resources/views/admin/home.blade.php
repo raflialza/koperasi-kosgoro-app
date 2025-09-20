@@ -48,7 +48,7 @@
 
         {{-- Pinjaman Aktif --}}
         <div class="col-md-3 mb-4">
-            <a href="{{ route('admin.pinjaman.index') }}" class="text-decoration-none">
+            <a href="{{ route('admin.pinjaman.index', ['status' => 'Disetujui']) }}" class="text-decoration-none">
                 <div class="card border-0 rounded-4 shadow-sm h-100 p-2 hover-scale card-info">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
@@ -66,7 +66,8 @@
 
         {{-- Pengajuan Menunggu --}}
         <div class="col-md-3 mb-4">
-            <a href="{{ route('admin.pinjaman.pengajuan') }}" class="text-decoration-none">
+            {{-- PERBAIKAN: Tautan disesuaikan ke route yang benar --}}
+            <a href="{{ route('admin.pinjaman.index', ['status' => 'Menunggu Persetujuan']) }}" class="text-decoration-none">
                 <div class="card border-0 rounded-4 shadow-sm h-100 p-2 hover-scale card-warning">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">

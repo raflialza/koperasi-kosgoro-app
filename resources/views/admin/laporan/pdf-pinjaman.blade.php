@@ -35,10 +35,12 @@
     <div class="header">
         <h1>Laporan Pinjaman Anggota</h1>
         <p>Koperasi Kosgoro</p>
-        @if($startDate && $endDate)
-            <p><strong>Periode:</strong> {{ \Carbon\Carbon::parse($startDate)->format('d F Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}</p>
-        @else
-            <p><strong>Periode:</strong> Keseluruhan</p>
+        @if(isset($startDate) && isset($endDate))
+            @if($startDate && $endDate)
+                <p><strong>Periode:</strong> {{ \Carbon\Carbon::parse($startDate)->format('d F Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}</p>
+            @else
+                <p><strong>Periode:</strong> Keseluruhan</p>
+            @endif
         @endif
     </div>
 
@@ -51,31 +53,37 @@
                     <th>Nama Anggota</th>
                     <th>Tgl Pengajuan</th>
                     <th class="text-right">Pinjaman Pokok</th>
-                    <th class="text-right">Bunga</th>
+                    <th class="text-right">Margin</th>
                     <th class="text-right">Total Tagihan</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($semuaPinjaman as $pinjaman)
+                @php
+                    $pinjamanList = isset($semuaPinjaman) ? $semuaPinjaman : (isset($pinjaman) ? [$pinjaman] : []);
+                @endphp
+                @forelse ($pinjamanList as $item)
+                @php
+                    $marginAmount = $item->jumlah_pinjaman * ($item->margin / 100);
+                    $tagihanAmount = $item->jumlah_pinjaman + $marginAmount;
+                @endphp
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $pinjaman->user->id_anggota }}</td>
-                    <td>{{ $pinjaman->user->nama }}</td>
-                    <td>{{ \Carbon\Carbon::parse($pinjaman->tanggal_pengajuan)->format('d-m-Y') }}</td>
-                    <td class="text-right">Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($pinjaman->total_tagihan - $pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($pinjaman->total_tagihan, 0, ',', '.') }}</td>
+                    <td>{{ $item->user->id_anggota }}</td>
+                    <td>{{ $item->user->nama }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->format('d-m-Y') }}</td>
+                    <td class="text-right">Rp {{ number_format($item->jumlah_pinjaman, 0, ',', '.') }}</td>
+                    <td class="text-right">Rp {{ number_format($marginAmount, 0, ',', '.') }}</td>
+                    <td class="text-right">Rp {{ number_format($tagihanAmount, 0, ',', '.') }}</td>
                     <td>
-                        @if($pinjaman->status == 'disetujui')
-                            <span class="badge bg-success">Aktif</span>
-                        @elseif($pinjaman->status == 'lunas')
-                            <span class="badge bg-info">Lunas</span>
-                        @elseif($pinjaman->status == 'menunggu')
-                            <span class="badge bg-warning">Menunggu</span>
-                        @elseif($pinjaman->status == 'ditolak')
-                            <span class="badge bg-danger">Ditolak</span>
-                        @endif
+                        <span class="badge 
+                            @if($item->status == 'Disetujui') bg-success 
+                            @elseif($item->status == 'Lunas') bg-info 
+                            @elseif($item->status == 'Menunggu Persetujuan') bg-warning
+                            @elseif($item->status == 'Ditolak') bg-danger
+                            @endif">
+                            {{ $item->status }}
+                        </span>
                     </td>
                 </tr>
                 @empty
@@ -86,20 +94,23 @@
             </tbody>
         </table>
 
+        {{-- Tabel Ringkasan (Hanya tampil jika ini adalah laporan) --}}
+        @if(isset($totalPokok))
         <table class="summary-table">
             <tr>
                 <td class="label">Total Pinjaman Pokok</td>
                 <td class="text-right">Rp {{ number_format($totalPokok, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td class="label">Total Bunga Pinjaman</td>
-                <td class="text-right">Rp {{ number_format($totalBunga, 0, ',', '.') }}</td>
+                <td class="label">Total Margin Pinjaman</td>
+                <td class="text-right">Rp {{ number_format($totalMargin, 0, ',', '.') }}</td>
             </tr>
             <tr style="font-weight: bold; background-color: #f2f7ff;">
                 <td class="label">Total Keseluruhan Tagihan</td>
-                <td class="text-right">Rp {{ number_format($totalPinjaman, 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($totalTagihan, 0, ',', '.') }}</td>
             </tr>
         </table>
+        @endif
     </div>
 
     <div class="footer">
@@ -107,3 +118,4 @@
     </div>
 </body>
 </html>
+

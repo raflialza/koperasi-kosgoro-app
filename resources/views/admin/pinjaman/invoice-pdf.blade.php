@@ -16,23 +16,24 @@
         th { background-color: #f2f2f2; }
         .total-section { text-align: right; }
         .total-section h4 { margin: 5px 0; }
-        .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #777; }
+        .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #777; position: fixed; bottom: 0; left: 0; right: 0; }
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 100px;
-            color: rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.08);
             font-weight: bold;
             z-index: -1;
         }
     </style>
 </head>
 <body>
-    @if($pinjaman->status == 'lunas')
+    {{-- PERBAIKAN: Status disesuaikan --}}
+    @if($pinjaman->status == 'Lunas')
         <div class="watermark">LUNAS</div>
-    @elseif($pinjaman->status == 'ditolak')
+    @elseif($pinjaman->status == 'Ditolak')
         <div class="watermark">DITOLAK</div>
     @endif
 
@@ -59,18 +60,25 @@
 
         <div class="content">
             <h4>Rincian Pinjaman</h4>
+            
+            {{-- PERBAIKAN: Perhitungan dilakukan di sini --}}
+            @php
+                $marginAmount = $pinjaman->jumlah_pinjaman * ($pinjaman->margin / 100);
+                $totalTagihan = $pinjaman->jumlah_pinjaman + $marginAmount;
+            @endphp
+
             <table>
                 <tr>
                     <th style="width: 50%;">Pinjaman Pokok</th>
                     <td style="text-align: right;">Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
-                    <th>Bunga ({{ $pinjaman->persentase_bunga * 100 }}%)</th>
-                    <td style="text-align: right;">Rp {{ number_format($pinjaman->total_tagihan - $pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
+                    <th>Margin ({{ $pinjaman->margin }}%)</th>
+                    <td style="text-align: right;">Rp {{ number_format($marginAmount, 0, ',', '.') }}</td>
                 </tr>
                 <tr style="font-weight: bold;">
                     <th>Total Tagihan</th>
-                    <td style="text-align: right;">Rp {{ number_format($pinjaman->total_tagihan, 0, ',', '.') }}</td>
+                    <td style="text-align: right;">Rp {{ number_format($totalTagihan, 0, ',', '.') }}</td>
                 </tr>
             </table>
 
@@ -108,3 +116,4 @@
     </div>
 </body>
 </html>
+

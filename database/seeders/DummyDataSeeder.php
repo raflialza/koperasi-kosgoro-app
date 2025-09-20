@@ -36,53 +36,54 @@ class DummyDataSeeder extends Seeder
             'tahun_gabung' => now()->year,
         ]);
 
-        // --- Daftar Anggota dari Manhwa ---
+        // --- Daftar Anggota ---
         $anggotaList = [
+            ['nama' => 'Anggota', 'email' => 'anggota@email.com'],
             // Infinite Mage (6)
-            ['nama' => 'Shirone Arian', 'email' => 'shirone.arian@email.com'],
-            ['nama' => 'Amy Karmis', 'email' => 'amy.karmis@email.com'],
-            ['nama' => 'Rian Ogent', 'email' => 'rian.ogent@email.com'],
-            ['nama' => 'Tess Elzaine', 'email' => 'tess.elzaine@email.com'],
-            ['nama' => 'Neid', 'email' => 'neid.swordsman@email.com'],
-            ['nama' => 'Eruki', 'email' => 'eruki.scholar@email.com'],
+            ['nama' => 'Shirone Arian', 'email' => 'shirone@email.com'],
+            ['nama' => 'Amy Karmis', 'email' => 'amy@email.com'],
+            ['nama' => 'Rian Ogent', 'email' => 'rian@email.com'],
+            ['nama' => 'Tess Elzaine', 'email' => 'tess@email.com'],
+            ['nama' => 'Neid', 'email' => 'neid@email.com'],
+            ['nama' => 'Eruki', 'email' => 'eruki@email.com'],
 
             // Pick Me Up (6)
-            ['nama' => 'Loki', 'email' => 'loki.master@email.com'],
-            ['nama' => 'Syris Agentheim', 'email' => 'syris.agentheim@email.com'],
-            ['nama' => 'Yurnet Seed', 'email' => 'yurnet.seed@email.com'],
-            ['nama' => 'Nihaku Geistfeld', 'email' => 'nihaku.geistfeld@email.com'],
-            ['nama' => 'Ridigion', 'email' => 'ridigion.warrior@email.com'],
-            ['nama' => 'Muden Nidelk', 'email' => 'muden.nidelk@email.com'],
+            ['nama' => 'Loki', 'email' => 'loki@email.com'],
+            ['nama' => 'Syris Agentheim', 'email' => 'syris@email.com'],
+            ['nama' => 'Yurnet Seed', 'email' => 'yurnet@email.com'],
+            ['nama' => 'Nihaku Geistfeld', 'email' => 'nihaku@email.com'],
+            ['nama' => 'Ridigion', 'email' => 'ridigion@email.com'],
+            ['nama' => 'Muden Nidelk', 'email' => 'muden@email.com'],
 
             // Magic Academy Genius Blinker (5)
-            ['nama' => 'Baek Yu Seol', 'email' => 'baek.yuseol@email.com'],
-            ['nama' => 'Hong Bi Yeon', 'email' => 'hong.biyeon@email.com'],
-            ['nama' => 'Aiselle Molf', 'email' => 'aiselle.molf@email.com'],
-            ['nama' => 'Flame', 'email' => 'flame.spirit@email.com'],
-            ['nama' => 'Ma Yu Seong', 'email' => 'ma.yuseong@email.com'],
+            ['nama' => 'Baek Yu Seol', 'email' => 'yuseol@email.com'],
+            ['nama' => 'Hong Bi Yeon', 'email' => 'biyeon@email.com'],
+            ['nama' => 'Aiselle Molf', 'email' => 'aiselle@email.com'],
+            ['nama' => 'Flame', 'email' => 'flame@email.com'],
+            ['nama' => 'Ma Yu Seong', 'email' => 'mayuseong@email.com'],
 
             // Terminally-ill Genius Dark Knight (5)
-            ['nama' => 'Knox Von Reinhaver', 'email' => 'knox.reinhaver@email.com'],
-            ['nama' => 'Penelope Von Arkheim', 'email' => 'penelope.arkheim@email.com'],
-            ['nama' => 'Thalia Von Steelinor', 'email' => 'thalia.steelinor@email.com'],
-            ['nama' => 'Elanor De Rivalin', 'email' => 'elanor.rivalin@email.com'],
-            ['nama' => 'Leon Von Marbas', 'email' => 'leon.marbas@email.com'],
-            
+            ['nama' => 'Knox Von Reinhaver', 'email' => 'knox@email.com'],
+            ['nama' => 'Penelope Von Arkheim', 'email' => 'penelope@email.com'],
+            ['nama' => 'Thalia Von Steelinor', 'email' => 'thalia@email.com'],
+            ['nama' => 'Elanor De Rivalin', 'email' => 'elanor@email.com'],
+            ['nama' => 'Leon Von Marbas', 'email' => 'leon@email.com'],
+
             // The Extra Academy Survival Guide (6)
-            ['nama' => 'Ed Rothtaylor', 'email' => 'ed.rothtaylor@email.com'],
-            ['nama' => 'Lortelle Kecheln', 'email' => 'lortelle.kecheln@email.com'],
-            ['nama' => 'Lucy Maeril', 'email' => 'lucy.maeril@email.com'],
-            ['nama' => 'Janica Faylover', 'email' => 'janica.faylover@email.com'],
-            ['nama' => 'Clarice Ecknair', 'email' => 'clarice.ecknair@email.com'],
-            ['nama' => 'Zix', 'email' => 'zix.spearman@email.com'],
+            ['nama' => 'Ed Rothtaylor', 'email' => 'ed@email.com'],
+            ['nama' => 'Lortelle Kecheln', 'email' => 'lortelle@email.com'],
+            ['nama' => 'Lucy Maeril', 'email' => 'lucy@email.com'],
+            ['nama' => 'Janica Faylover', 'email' => 'janica@email.com'],
+            ['nama' => 'Clarice Ecknair', 'email' => 'clarice@email.com'],
+            ['nama' => 'Zix', 'email' => 'zix@email.com'],
 
             // The Novel's Extra (6)
-            ['nama' => 'Kim Hajin', 'email' => 'kim.hajin@email.com'],
-            ['nama' => 'Kim Suho', 'email' => 'kim.suho@email.com'],
-            ['nama' => 'Chae Nayun', 'email' => 'chae.nayun@email.com'],
-            ['nama' => 'Yoo Yeonha', 'email' => 'yoo.yeonha@email.com'],
-            ['nama' => 'Rachel', 'email' => 'rachel.english@email.com'],
-            ['nama' => 'Evangel', 'email' => 'evangel.spirit@email.com'],
+            ['nama' => 'Kim Hajin', 'email' => 'hajin@email.com'],
+            ['nama' => 'Kim Suho', 'email' => 'suho@email.com'],
+            ['nama' => 'Chae Nayun', 'email' => 'nayun@email.com'],
+            ['nama' => 'Yoo Yeonha', 'email' => 'yeonha@email.com'],
+            ['nama' => 'Rachel', 'email' => 'rachel@email.com'],
+            ['nama' => 'Evangel', 'email' => 'evangel@email.com'],
 
             // Lookism (15)
             ['nama' => 'Park Hyung Seok', 'email' => 'park.hyungseok@email.com'],
@@ -121,105 +122,112 @@ class DummyDataSeeder extends Seeder
 
         $this->command->info('Data admin dan anggota berhasil dibuat.');
 
-        // Ambil semua ID anggota yang ada
         $anggotaIds = User::where('role', 'anggota')->pluck('id');
         if ($anggotaIds->isEmpty()) {
             $this->command->error('Tidak ada anggota ditemukan untuk membuat pinjaman.');
             return;
         }
 
-        $keperluanList = ['Renovasi Rumah', 'Biaya Pendidikan', 'Modal Usaha', 'Kebutuhan Mendesak', 'Pembelian Kendaraan'];
+        $keteranganList = ['Renovasi Rumah', 'Biaya Pendidikan', 'Modal Usaha', 'Kebutuhan Mendesak', 'Pembelian Kendaraan'];
 
-        // --- Membuat 30 Pinjaman dengan status MENUNGGU ---
-        $this->command->info('Membuat 30 data pinjaman status MENUNGGU...');
-        for ($i = 0; $i < 30; $i++) {
-            $pokok = rand(10, 100) * 100000;
+        // --- Membuat Pinjaman dengan status MENUNGGU ---
+        $this->command->info('Membuat data pinjaman status MENUNGGU...');
+        for ($i = 0; $i < 10; $i++) {
             Pinjaman::create([
                 'user_id'           => $anggotaIds->random(),
-                'jumlah_pinjaman'   => $pokok,
-                'persentase_bunga'  => 0.10,
-                'total_tagihan'     => $pokok + ($pokok * 0.10),
+                'jumlah_pinjaman'   => rand(10, 100) * 100000,
+                'margin'            => rand(1, 10),
                 'tenor'             => collect([6, 12, 18, 24])->random(),
-                'keperluan'         => collect($keperluanList)->random(),
+                'keterangan'        => collect($keteranganList)->random(),
                 'tanggal_pengajuan' => now()->subDays(rand(1, 30)),
-                'status'            => 'menunggu',
+                'status'            => 'Menunggu Persetujuan',
             ]);
         }
         
-        // --- Membuat 30 Pinjaman dengan status DITOLAK ---
-        $this->command->info('Membuat 30 data pinjaman status DITOLAK...');
-        for ($i = 0; $i < 30; $i++) {
-            $pokok = rand(10, 100) * 100000;
+        // --- Membuat Pinjaman dengan status DITOLAK ---
+        $this->command->info('Membuat data pinjaman status DITOLAK...');
+        for ($i = 0; $i < 10; $i++) {
             Pinjaman::create([
                 'user_id'           => $anggotaIds->random(),
-                'jumlah_pinjaman'   => $pokok,
-                'persentase_bunga'  => 0.10,
-                'total_tagihan'     => $pokok + ($pokok * 0.10),
+                'jumlah_pinjaman'   => rand(10, 100) * 100000,
+                'margin'            => rand(1, 10),
                 'tenor'             => collect([6, 12, 18, 24])->random(),
-                'keperluan'         => collect($keperluanList)->random(),
+                'keterangan'        => collect($keteranganList)->random(),
                 'tanggal_pengajuan' => now()->subDays(rand(31, 90)),
-                'status'            => 'ditolak',
-                'approved_by'       => $superAdmin->id,
+                'status'            => 'Ditolak',
             ]);
         }
 
-        // --- Membuat 30 Pinjaman dengan status DISETUJUI (AKTIF) ---
-        $this->command->info('Membuat 30 data pinjaman status DISETUJUI...');
-        for ($i = 0; $i < 30; $i++) {
+        // --- Membuat Pinjaman dengan status DISETUJUI (AKTIF) ---
+        $this->command->info('Membuat data pinjaman status DISETUJUI...');
+        for ($i = 0; $i < 10; $i++) {
             $pokok = rand(10, 100) * 100000;
+            $margin = rand(1, 10);
+            $tenor = collect([6, 12, 18, 24])->random();
+
             $pinjaman = Pinjaman::create([
                 'user_id'           => $anggotaIds->random(),
                 'jumlah_pinjaman'   => $pokok,
-                'persentase_bunga'  => 0.10,
-                'total_tagihan'     => $pokok + ($pokok * 0.10),
-                'tenor'             => collect([6, 12, 18, 24])->random(),
-                'keperluan'         => collect($keperluanList)->random(),
+                'margin'            => $margin,
+                'tenor'             => $tenor,
+                'keterangan'        => collect($keteranganList)->random(),
                 'tanggal_pengajuan' => now()->subMonths(rand(2, 6)),
                 'tanggal_disetujui' => now()->subMonths(rand(1, 5)),
-                'status'            => 'disetujui',
-                'approved_by'       => $superAdmin->id,
+                'status'            => 'Disetujui',
             ]);
-            // Buat beberapa angsuran acak untuk pinjaman aktif
-            $jumlahAngsuran = rand(1, $pinjaman->tenor - 1);
-            for ($j = 1; $j <= $jumlahAngsuran; $j++) {
+            
+            // Buat beberapa angsuran acak
+            $totalMargin = $pokok * ($margin / 100);
+            $totalTagihan = $pokok + $totalMargin;
+            $angsuranPerBulan = $totalTagihan / $tenor;
+            $jumlahAngsuranDibuat = rand(1, $tenor - 1);
+            
+            for ($j = 1; $j <= $jumlahAngsuranDibuat; $j++) {
                 Angsuran::create([
                     'pinjaman_id'   => $pinjaman->id,
-                    'jumlah_bayar'  => round($pinjaman->total_tagihan / $pinjaman->tenor),
+                    'jumlah_bayar'  => round($angsuranPerBulan),
                     'tanggal_bayar' => Carbon::parse($pinjaman->tanggal_disetujui)->addMonths($j),
                     'angsuran_ke'   => $j,
-                    'processed_by'  => $superAdmin->id,
+                    'processed_by'  => $superAdmin->id, // PERBAIKAN DI SINI
                 ]);
             }
         }
 
-        // --- Membuat 30 Pinjaman dengan status LUNAS ---
-        $this->command->info('Membuat 30 data pinjaman status LUNAS...');
-        for ($i = 0; $i < 30; $i++) {
+        // --- Membuat Pinjaman dengan status LUNAS ---
+        $this->command->info('Membuat data pinjaman status LUNAS...');
+        for ($i = 0; $i < 10; $i++) {
             $pokok = rand(10, 100) * 100000;
+            $margin = rand(1, 10);
+            $tenor = collect([6, 12])->random();
+            
             $pinjaman = Pinjaman::create([
                 'user_id'           => $anggotaIds->random(),
                 'jumlah_pinjaman'   => $pokok,
-                'persentase_bunga'  => 0.10,
-                'total_tagihan'     => $pokok + ($pokok * 0.10),
-                'tenor'             => collect([6, 12])->random(),
-                'keperluan'         => collect($keperluanList)->random(),
+                'margin'            => $margin,
+                'tenor'             => $tenor,
+                'keterangan'        => collect($keteranganList)->random(),
                 'tanggal_pengajuan' => now()->subMonths(rand(12, 24)),
                 'tanggal_disetujui' => now()->subMonths(rand(10, 11)),
-                'status'            => 'lunas',
-                'approved_by'       => $superAdmin->id,
+                'status'            => 'Lunas',
             ]);
-            // Buat angsuran lengkap untuk pinjaman lunas
-            for ($j = 1; $j <= $pinjaman->tenor; $j++) {
+
+            // Buat angsuran lengkap
+            $totalMargin = $pokok * ($margin / 100);
+            $totalTagihan = $pokok + $totalMargin;
+            $angsuranPerBulan = $totalTagihan / $tenor;
+            
+            for ($j = 1; $j <= $tenor; $j++) {
                 Angsuran::create([
                     'pinjaman_id'   => $pinjaman->id,
-                    'jumlah_bayar'  => round($pinjaman->total_tagihan / $pinjaman->tenor),
+                    'jumlah_bayar'  => round($angsuranPerBulan),
                     'tanggal_bayar' => Carbon::parse($pinjaman->tanggal_disetujui)->addMonths($j),
                     'angsuran_ke'   => $j,
-                    'processed_by'  => $superAdmin->id,
+                    'processed_by'  => $superAdmin->id, // PERBAIKAN DI SINI
                 ]);
             }
         }
 
-        $this->command->info('Selesai membuat 120 data pinjaman acak.');
+        $this->command->info('Selesai membuat data pinjaman acak.');
     }
 }
+

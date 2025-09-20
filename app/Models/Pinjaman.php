@@ -14,14 +14,13 @@ class Pinjaman extends Model
     protected $fillable = [
         'user_id',
         'jumlah_pinjaman',
-        'persentase_bunga',
-        'total_tagihan',
+        'margin',           // 'interest' diubah menjadi 'margin'
         'tenor',
         'status',
         'tanggal_pengajuan',
         'tanggal_disetujui',
-        'keperluan',
-        'approved_by',
+        'keterangan',       // 'keperluan' diubah menjadi 'keterangan'
+        'approved_by'
     ];
 
     /**

@@ -159,8 +159,9 @@
                         <ul class="nav flex-column">
                             <li class="nav-item"><a href="{{ route('admin.transaksi.semua') }}" class="nav-link {{ request()->routeIs('admin.transaksi.semua') ? 'fw-bold' : '' }}">Semua Transaksi</a></li>
                             <li class="nav-item"><a href="{{ route('admin.simpanan.index') }}" class="nav-link {{ request()->routeIs('admin.simpanan.*') ? 'fw-bold' : '' }}">Kelola Simpanan</a></li>
-                            <li class="nav-item"><a href="{{ route('admin.pinjaman.pengajuan') }}" class="nav-link {{ request()->routeIs('admin.pinjaman.pengajuan') ? 'fw-bold' : '' }}">Proses Pengajuan</a></li>
-                            <li class="nav-item"><a href="{{ route('admin.pinjaman.index') }}" class="nav-link {{ request()->routeIs('admin.pinjaman.index') ? 'fw-bold' : '' }}">Semua Pinjaman</a></li>
+                            {{-- PERBAIKAN DI SINI --}}
+                            <li class="nav-item"><a href="{{ route('admin.pinjaman.index', ['status' => 'Menunggu Persetujuan']) }}" class="nav-link {{ request()->query('status') == 'Menunggu Persetujuan' ? 'fw-bold' : '' }}">Proses Pengajuan</a></li>
+                            <li class="nav-item"><a href="{{ route('admin.pinjaman.index') }}" class="nav-link {{ request()->routeIs('admin.pinjaman.index') && !request()->query('status') ? 'fw-bold' : '' }}">Semua Pinjaman</a></li>
                         </ul>
                     </div>
                 </li>

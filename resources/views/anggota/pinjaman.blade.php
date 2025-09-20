@@ -5,14 +5,14 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Riwayat Pinjaman Saya</h4>
         <a href="{{ route('anggota.pinjaman.ajukan') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Ajukan Pinjaman Baru
+            <i class="bi bi-plus-circle"></i> Ajukan Pinjaman Baru
         </a>
     </div>
 
-    <div class="card shadow-sm modern-card">
+    <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table modern-table">
+                <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>Tanggal Pengajuan</th>
@@ -25,30 +25,29 @@
                     <tbody>
                         @forelse ($daftarPinjaman as $pinjaman)
                             <tr>
-                                <td>{{ \Carbon\Carbon::parse($pinjaman->tanggal_pengajuan)->format('d M Y') }}</td>
-                                <td>Rp{{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($pinjaman->tanggal_pengajuan)->translatedFormat('d F Y') }}</td>
+                                <td>Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
                                 <td>{{ $pinjaman->tenor }} bulan</td>
                                 <td>
-                                    @php
-                                        $badgeColor = 'bg-secondary';
-                                        if ($pinjaman->status == 'disetujui') $badgeColor = 'bg-success';
-                                        if ($pinjaman->status == 'menunggu') $badgeColor = 'bg-warning text-dark';
-                                        if ($pinjaman->status == 'ditolak') $badgeColor = 'bg-danger';
-                                        if ($pinjaman->status == 'lunas') $badgeColor = 'bg-info';
-                                    @endphp
-                                    <span class="badge {{ $badgeColor }}">{{ ucfirst($pinjaman->status) }}</span>
+                                    <span class="badge 
+                                        @if($pinjaman->status == 'Disetujui') bg-success 
+                                        @elseif($pinjaman->status == 'Lunas') bg-info
+                                        @elseif($pinjaman->status == 'Menunggu Persetujuan') bg-warning text-dark
+                                        @elseif($pinjaman->status == 'Ditolak') bg-danger
+                                        @endif">
+                                        {{ $pinjaman->status }}
+                                    </span>
                                 </td>
                                 <td>
-                                    @if($pinjaman->status == 'disetujui' || $pinjaman->status == 'lunas')
-                                        <a href="{{ route('anggota.pinjaman.detail', $pinjaman->id) }}" class="btn btn-sm btn-info">
-                                            <i class="bi bi-eye-fill"></i> Detail
-                                        </a>
-                                    @endif
+                                    {{-- TOMBOL BARU UNTUK MELIHAT DETAIL --}}
+                                    <a href="{{ route('anggota.pinjaman.detail', $pinjaman->id) }}" class="btn btn-info btn-sm">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-4">Anda belum memiliki riwayat pengajuan pinjaman.</td>
+                                <td colspan="5" class="text-center">Anda belum memiliki riwayat pinjaman.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -58,21 +57,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // --- Notifikasi Sukses dengan SweetAlert ---
-    const successMessage = @json(session('success'));
-    if (successMessage) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Pengajuan Berhasil!',
-            text: 'Mohon tunggu konfirmasi dari admin.',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Baik'
-        });
-    }
-});
-</script>
-@endpush

@@ -86,19 +86,21 @@ class LaporanController extends Controller
             ->orderBy('tanggal_pengajuan', 'desc')
             ->get();
             
-        // Menghitung total pokok dan bunga
-        $pinjamanAktif = $semuaPinjaman->where('status', '!=', 'ditolak');
+        // --- PERBAIKAN PERHITUNGAN DI SINI ---
+        $pinjamanAktif = $semuaPinjaman->where('status', '!=', 'Ditolak');
         $totalPokok = $pinjamanAktif->sum('jumlah_pinjaman');
-        $totalPinjaman = $pinjamanAktif->sum('total_tagihan');
-        $totalBunga = $totalPinjaman - $totalPokok;
+        $totalMargin = $pinjamanAktif->sum(function($pinjaman) {
+            return $pinjaman->jumlah_pinjaman * ($pinjaman->margin / 100);
+        });
+        $totalTagihan = $totalPokok + $totalMargin;
 
         $data = [
             'semuaPinjaman' => $semuaPinjaman,
             'startDate' => $startDate,
             'endDate' => $endDate,
             'totalPokok' => $totalPokok,
-            'totalBunga' => $totalBunga,
-            'totalPinjaman' => $totalPinjaman,
+            'totalMargin' => $totalMargin,
+            'totalTagihan' => $totalTagihan,
         ];
         $pdf = Pdf::loadView('admin.laporan.pdf-pinjaman', $data);
         return $pdf->stream('laporan-pinjaman-'.$startDate.'-'.$endDate.'.pdf');
@@ -111,19 +113,21 @@ class LaporanController extends Controller
     {
         $semuaPinjaman = Pinjaman::with('user')->orderBy('tanggal_pengajuan', 'desc')->get();
         
-        // Menghitung total pokok dan bunga
-        $pinjamanAktif = $semuaPinjaman->where('status', '!=', 'ditolak');
+        // --- PERBAIKAN PERHITUNGAN DI SINI ---
+        $pinjamanAktif = $semuaPinjaman->where('status', '!=', 'Ditolak');
         $totalPokok = $pinjamanAktif->sum('jumlah_pinjaman');
-        $totalPinjaman = $pinjamanAktif->sum('total_tagihan');
-        $totalBunga = $totalPinjaman - $totalPokok;
+        $totalMargin = $pinjamanAktif->sum(function($pinjaman) {
+            return $pinjaman->jumlah_pinjaman * ($pinjaman->margin / 100);
+        });
+        $totalTagihan = $totalPokok + $totalMargin;
 
         $data = [
             'semuaPinjaman' => $semuaPinjaman,
             'startDate' => null,
             'endDate' => null,
             'totalPokok' => $totalPokok,
-            'totalBunga' => $totalBunga,
-            'totalPinjaman' => $totalPinjaman,
+            'totalMargin' => $totalMargin,
+            'totalTagihan' => $totalTagihan,
         ];
         $pdf = Pdf::loadView('admin.laporan.pdf-pinjaman', $data);
         return $pdf->stream('laporan-keseluruhan-pinjaman.pdf');

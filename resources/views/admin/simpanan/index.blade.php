@@ -73,32 +73,24 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // JavaScript untuk mengisi data ke dalam modal saat tombol 'View' diklik
+    // --- PERUBAHAN: JavaScript untuk membaca data langsung dari atribut tombol ---
     const detailModal = document.getElementById('detailSimpananModal');
     if (detailModal) {
         detailModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-            const userUrl = button.getAttribute('data-url');
-            
-            // Tampilkan loading
             const modalBody = detailModal.querySelector('.modal-body');
-            modalBody.querySelector('#modal-nama').textContent = 'Memuat...';
-            // ... (kosongkan field lain)
-
-            fetch(userUrl)
-            .then(response => response.json())
-            .then(data => {
-                modalBody.querySelector('#modal-nama').textContent = data.nama;
-                modalBody.querySelector('#modal-id-anggota').textContent = data.id_anggota;
-                modalBody.querySelector('#modal-total-pokok').textContent = data.total_pokok;
-                modalBody.querySelector('#modal-total-wajib').textContent = data.total_wajib;
-                modalBody.querySelector('#modal-total-sukarela').textContent = data.total_sukarela;
-                modalBody.querySelector('#modal-total-semua').textContent = data.total_semua;
-            });
+            
+            // Ambil data langsung dari atribut data-* tombol
+            modalBody.querySelector('#modal-nama').textContent = button.getAttribute('data-nama');
+            modalBody.querySelector('#modal-id-anggota').textContent = button.getAttribute('data-id-anggota');
+            modalBody.querySelector('#modal-total-pokok').textContent = button.getAttribute('data-total-pokok');
+            modalBody.querySelector('#modal-total-wajib').textContent = button.getAttribute('data-total-wajib');
+            modalBody.querySelector('#modal-total-sukarela').textContent = button.getAttribute('data-total-sukarela');
+            modalBody.querySelector('#modal-total-semua').textContent = button.getAttribute('data-total-semua');
         });
     }
 
-// --- Pencarian Otomatis saat Mengetik ---
+    // --- Pencarian Otomatis saat Mengetik (tidak ada perubahan) ---
     let searchTimeout;
     const searchInput = document.getElementById('searchInput');
     const listBody = document.getElementById('anggota-simpanan-list');
