@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Models\Simpanan;
-use App\Models\Setting; // Ditambahkan untuk mengakses model Setting
+use App\Models\Setting;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 
@@ -31,14 +31,9 @@ class TambahSimpananBulanan extends Command
     {
         $this->info('Memulai proses penambahan simpanan pokok dan wajib bulanan...');
 
-        // --- PERUBAHAN UTAMA DI SINI ---
-        // Mengambil nilai dari tabel 'settings' di database.
-        // Jika pengaturan tidak ditemukan, gunakan nilai default (misal: 100000).
         $jumlahPokok = Setting::where('key', 'simpanan_pokok_otomatis')->first()->value ?? 100000;
         $jumlahWajib = Setting::where('key', 'simpanan_wajib_otomatis')->first()->value ?? 50000;
-
         $this->info("Menggunakan nilai dari database: Pokok (Rp ".number_format($jumlahPokok)."), Wajib (Rp ".number_format($jumlahWajib).")");
-        // ----------------------------------------------------
 
         $anggota = User::where('role', 'anggota')->get();
 
@@ -51,28 +46,29 @@ class TambahSimpananBulanan extends Command
         $berhasil = 0;
 
         foreach ($anggota as $user) {
-            // Cek apakah simpanan untuk bulan ini sudah ada
             $sudahAdaSimpanan = Simpanan::where('user_id', $user->id)
-                ->whereIn('jenis', ['Pokok', 'Wajib'])
+                ->whereIn('jenis_simpanan', ['Pokok', 'Wajib'])
                 ->where('keterangan', 'Iuran bulanan otomatis')
                 ->where('created_at', '>=', $bulanIni)
                 ->exists();
 
             if (!$sudahAdaSimpanan) {
-                // Tambahkan Simpanan Pokok menggunakan nilai dari database
+                // Tambahkan Simpanan Pokok
                 Simpanan::create([
                     'user_id' => $user->id,
-                    'jenis' => 'Pokok',
+                    'jenis_simpanan' => 'Pokok',
                     'jumlah' => $jumlahPokok,
                     'keterangan' => 'Iuran bulanan otomatis',
+                    'tanggal_transaksi' => now(), // PERBAIKAN DI SINI
                 ]);
 
-                // Tambahkan Simpanan Wajib menggunakan nilai dari database
+                // Tambahkan Simpanan Wajib
                 Simpanan::create([
                     'user_id' => $user->id,
-                    'jenis' => 'Wajib',
+                    'jenis_simpanan' => 'Wajib',
                     'jumlah' => $jumlahWajib,
                     'keterangan' => 'Iuran bulanan otomatis',
+                    'tanggal_transaksi' => now(), // PERBAIKAN DI SINI
                 ]);
 
                 $this->line("Simpanan pokok & wajib untuk {$user->nama} berhasil ditambahkan.");
