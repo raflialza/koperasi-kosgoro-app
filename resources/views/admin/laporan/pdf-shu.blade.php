@@ -26,37 +26,44 @@
     </div>
 
     <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>ID Anggota</th>
-                    <th>Nama Anggota</th>
-                    <th class="text-right">Total Simpanan (Pokok+Wajib)</th>
-                    <th class="text-right">Bagian SHU</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($dataShu as $data)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $data['id_anggota'] }}</td>
-                    <td>{{ $data['nama'] }}</td>
-                    <td class="text-right">Rp {{ number_format($data['total_simpanan'], 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($data['bagian_shu'], 2, ',', '.') }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" style="text-align: center;">Tidak ada data anggota untuk perhitungan SHU.</td>
-                </tr>
-                @endforelse
-            </tbody>
+        <table style="margin-bottom: 30px;">
+            <tr>
+                <td style="width: 70%;"><strong>Total Pendapatan Jasa/Margin Koperasi</strong></td>
+                <td class="text-right"><strong>Rp {{ number_format($totalPendapatanMargin, 2, ',', '.') }}</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Total SHU ({{ $alokasi['jasa_modal'] * 100 }}% dari Pendapatan)</strong></td>
+                <td class="text-right"><strong>Rp {{ number_format($shu, 2, ',', '.') }}</strong></td>
+            </tr>
         </table>
 
-        <div class="summary">
-            <strong>Total SHU yang Dibagikan:</strong>
-            <strong style="float: right;">Rp {{ number_format($totalShu, 0, ',', '.') }}</strong>
-        </div>
+        <h4>Rincian Alokasi SHU</h4>
+        <table>
+             <tr>
+                <td style="width: 70%;">Dana Cadangan ({{ $alokasi['dana_cadangan'] * 100 }}%)</td>
+                <td class="text-right">Rp {{ number_format($shuDanaCadangan, 2, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td>Jasa Usaha Anggota ({{ $alokasi['jasa_usaha'] * 100 }}%)</td>
+                <td class="text-right">Rp {{ number_format($shuJasaUsaha, 2, ',', '.') }}</td>
+            </tr>
+             <tr>
+                <td>Jasa Modal Anggota ({{ $alokasi['jasa_modal'] * 100 }}%)</td>
+                <td class="text-right">Rp {{ number_format($shuJasaModal, 2, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td>Dana Pengurus & Karyawan ({{ $alokasi['dana_pengurus'] * 100 }}%)</td>
+                <td class="text-right">Rp {{ number_format($shuDanaPengurus, 2, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td>Dana Sosial ({{ $alokasi['dana_sosial'] * 100 }}%)</td>
+                <td class="text-right">Rp {{ number_format($shuDanaSosial, 2, ',', '.') }}</td>
+            </tr>
+             <tr style="background-color: #f2f7ff; font-weight: bold;">
+                <td>TOTAL</td>
+                <td class="text-right">Rp {{ number_format($shu, 2, ',', '.') }}</td>
+            </tr>
+        </table>
     </div>
 
     <div class="footer">

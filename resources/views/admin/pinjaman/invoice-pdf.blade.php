@@ -16,7 +16,7 @@
         th { background-color: #f2f2f2; }
         .total-section { text-align: right; }
         .total-section h4 { margin: 5px 0; }
-        .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #777; position: fixed; bottom: 0; left: 0; right: 0; }
+        .footer { text-align: center; margin-top: 40px; font-size: 10px; color: #777; }
         .watermark {
             position: absolute;
             top: 50%;
@@ -30,7 +30,7 @@
     </style>
 </head>
 <body>
-    {{-- PERBAIKAN: Status disesuaikan --}}
+    {{-- Menambahkan watermark berdasarkan status pinjaman --}}
     @if($pinjaman->status == 'Lunas')
         <div class="watermark">LUNAS</div>
     @elseif($pinjaman->status == 'Ditolak')
@@ -60,21 +60,15 @@
 
         <div class="content">
             <h4>Rincian Pinjaman</h4>
-            
-            {{-- PERBAIKAN: Perhitungan dilakukan di sini --}}
-            @php
-                $marginAmount = $pinjaman->jumlah_pinjaman * ($pinjaman->margin / 100);
-                $totalTagihan = $pinjaman->jumlah_pinjaman + $marginAmount;
-            @endphp
-
             <table>
                 <tr>
                     <th style="width: 50%;">Pinjaman Pokok</th>
                     <td style="text-align: right;">Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
+                    {{-- Perhitungan disesuaikan dengan sistem margin --}}
                     <th>Margin ({{ $pinjaman->margin }}%)</th>
-                    <td style="text-align: right;">Rp {{ number_format($marginAmount, 0, ',', '.') }}</td>
+                    <td style="text-align: right;">Rp {{ number_format($totalMargin, 0, ',', '.') }}</td>
                 </tr>
                 <tr style="font-weight: bold;">
                     <th>Total Tagihan</th>
@@ -105,7 +99,7 @@
             @endif
 
             <div class="total-section">
-                <h4>Total Terbayar: Rp {{ number_format($pinjaman->angsuran->sum('jumlah_bayar'), 0, ',', '.') }}</h4>
+                <h4>Total Terbayar: Rp {{ number_format($totalTerbayar, 0, ',', '.') }}</h4>
                 <h4 style="color: #dc3545;">Sisa Tagihan: Rp {{ number_format($sisaPinjaman, 0, ',', '.') }}</h4>
             </div>
         </div>

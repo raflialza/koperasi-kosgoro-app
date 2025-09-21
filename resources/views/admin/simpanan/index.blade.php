@@ -8,8 +8,8 @@
             <div class="flex-grow-1 me-2">
                 <input type="text" class="form-control" id="searchInput" placeholder="Cari anggota..." value="{{ $search ?? '' }}">
             </div>
-            <a href="{{ route('admin.simpanan.create') }}" class="btn btn-primary text-nowrap">
-                <i class="bi bi-plus-circle"></i> Tambah Simpanan
+            <a href="{{ route('admin.pengaturan.index') }}" class="btn btn-secondary text-nowrap" title="Pengaturan Simpanan Otomatis">
+                <i class="bi bi-gear-fill"></i> Pengaturan
             </a>
         </div>
     </div>

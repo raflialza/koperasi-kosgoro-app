@@ -3,7 +3,17 @@
     <td>{{ $a->id_anggota }}</td>
     <td>{{ $a->nama }}</td>
     <td>{{ $a->email }}</td>
-    <td>{{ $a->instansi }}</td>
+    <td>
+        @if($a->instansi == 'SMP')
+                <span class="badge bg-primary">{{ $a->instansi }}</span>
+            @elseif($a->instansi == 'SMA')
+                <span class="badge bg-success">{{ $a->instansi }}</span>
+            @elseif($a->instansi == 'SMK')
+                <span class="badge bg-warning text-dark">{{ $a->instansi }}</span>
+            @else
+                <span class="badge bg-secondary">{{ $a->instansi }}</span>
+        @endif
+    </td>
     <td>
         <div class="d-flex">
             <!-- Tombol Detail -->

@@ -122,15 +122,23 @@
 
     <nav class="sidebar p-3" id="sidebar">
         <div class="d-flex align-items-center mb-4 p-2">
-            <span class="sidebar-brand-icon"><i class="bi bi-box-fill me-2"></i></span>
+            <img src="{{ asset('images/logokosgoro.png') }}" alt="Logo" style="height: 40px; margin-right: 15px;">
             <span class="sidebar-brand-text">Koperasi</span>
         </div>
 
         @php $role = auth()->user()->role ?? 'guest'; @endphp
         <ul class="nav flex-column gap-2">
+            @if($role === 'anggota' || $role === 'admin' || $role === 'super_admin')
+                <li class="nav-item">
+                    <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
+                        <i class="bi bi-house-door me-3"></i>Dashboard
+                    </a>
+                </li>
+            @endif
+
             @if($role === 'anggota')
                 <li class="nav-item">
-                    <a href="{{ route('anggota.dataDiri') }}" class="nav-link {{ request()->routeIs('anggota.dataDiri') || request()->routeIs('home') ? 'active' : '' }}"><i class="bi bi-person-circle me-3"></i>Profil Saya</a>
+                    <a href="{{ route('anggota.dataDiri') }}" class="nav-link {{ request()->routeIs('anggota.dataDiri') || request()->routeIs('anggota.dataDiri') ? 'active' : '' }}"><i class="bi bi-person-circle me-3"></i>Profil Saya</a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('anggota.simpanan.riwayat') }}" class="nav-link {{ request()->routeIs('anggota.simpanan.*') ? 'active' : '' }}"><i class="bi bi-wallet2 me-3"></i>Simpanan Saya</a>
@@ -141,11 +149,6 @@
             @endif
 
             @if($role === 'admin' || $role === 'super_admin')
-                <li class="nav-item">
-                    <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
-                        <i class="bi bi-house-door me-3"></i>Home
-                    </a>
-                </li>
                 <li class="nav-item">
                     <a href="{{ route('admin.anggota.index') }}" class="nav-link {{ request()->routeIs('admin.anggota.*') ? 'active' : '' }}">
                         <i class="bi bi-people me-3"></i>Data Anggota

@@ -27,7 +27,7 @@ class SimpananController extends Controller
             });
         }
         
-        $semuaAnggota = $query->orderBy('nama', 'asc')->get();
+        $semuaAnggota = $query->orderBy('id_anggota', 'asc')->get();
 
         // DIUBAH: Menambahkan deteksi AJAX
         if ($request->ajax()) {
